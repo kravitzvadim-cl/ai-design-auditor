@@ -4,7 +4,9 @@ permissions:
   contents: read
 jobs:
   test:
-    runs-on: ubuntu-24.04
+    # 24.04 restricts Chromium's unprivileged namespaces via AppArmor.
+    # Use a supported host with sandbox support; do not disable the sandbox.
+    runs-on: ubuntu-22.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
