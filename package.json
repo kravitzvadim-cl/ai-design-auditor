@@ -15,7 +15,8 @@
     "demo": "npm run build && node dist/tools/run-fixture-demo.js",
     "capture": "npm run build && node dist/src/capture-cli.js",
     "report": "npm run build && node dist/src/report-cli.js",
-    "intake": "npm run build && node dist/tools/start-intake.js"
+    "intake": "npm run build && node dist/tools/start-intake.js",
+    "check:supabase": "npm run build && node dist/tools/check-supabase.js"
   },
   "devDependencies": {
     "@types/node": "22.20.5",
