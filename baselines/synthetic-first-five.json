@@ -1,0 +1,101 @@
+{
+  "id": "synthetic-synthetic-first-five",
+  "version": "1.0.0",
+  "coverage": "partial",
+  "sources": [
+    {
+      "id": "synthetic-synthetic-first-five-reference",
+      "url": "https://example.com/design-system/",
+      "snapshot": "fixtures/references/synthetic-first-five-0.json",
+      "sha256": "892c5ed2bcf1437a92d122b2e55836e3e28dc667bc850b364f1ec392da380b5b"
+    }
+  ],
+  "rules": [
+    {
+      "id": "COLOR-BG",
+      "category": "colors",
+      "status": "established",
+      "selector": "body",
+      "property": "background-color",
+      "source": {
+        "id": "synthetic-synthetic-first-five-reference",
+        "anchor": "ds-colour"
+      },
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#0b0c0d",
+          "light": "#f4f5f6"
+        }
+      }
+    },
+    {
+      "id": "TYPE-DISPLAY",
+      "category": "typography",
+      "status": "established",
+      "selector": "h1.display",
+      "property": "font-size",
+      "source": {
+        "id": "synthetic-synthetic-first-five-reference",
+        "anchor": "ds-type"
+      },
+      "expectation": {
+        "kind": "clamp-vw",
+        "min": 44,
+        "vw": 7.4,
+        "max": 108
+      }
+    },
+    {
+      "id": "SPACE-GRID",
+      "category": "spacing",
+      "status": "established",
+      "selector": ".g12",
+      "property": "column-gap",
+      "source": {
+        "id": "synthetic-synthetic-first-five-reference",
+        "anchor": "ds-space"
+      },
+      "expectation": {
+        "kind": "px",
+        "value": 24
+      },
+      "condition": {
+        "minWidthExclusive": 820
+      }
+    },
+    {
+      "id": "BORDER-SECTION",
+      "category": "borders-radii",
+      "status": "established",
+      "selector": ".sec",
+      "property": "border-bottom-width",
+      "source": {
+        "id": "synthetic-synthetic-first-five-reference",
+        "anchor": "ds-principles"
+      },
+      "expectation": {
+        "kind": "px",
+        "value": 1
+      }
+    },
+    {
+      "id": "LAYOUT-RAIL",
+      "category": "layout",
+      "status": "established",
+      "selector": ".rail",
+      "property": "width",
+      "source": {
+        "id": "synthetic-synthetic-first-five-reference",
+        "anchor": "ds-space"
+      },
+      "expectation": {
+        "kind": "px",
+        "value": 300
+      },
+      "condition": {
+        "minWidthExclusive": 820
+      }
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+# Keep secrets, private runtime data and development history out of container builds.
+.git
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+node_modules
+dist
+reports
+output
+docs/history
+.impeccable/review
+.DS_Store
+*.pem
+*.key
+*.p12
+*.pfx

@@ -1,0 +1,1011 @@
+{
+  "evidence": "Synthetic test reference, written for controlled fixtures. Not a snapshot or audit of a real portfolio.",
+  "rules": [
+    {
+      "id": "COLOR-BG",
+      "category": "colors",
+      "status": "established",
+      "property": "background-color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#0b0c0d",
+          "light": "#f4f5f6"
+        }
+      }
+    },
+    {
+      "id": "COLOR-RAIL",
+      "category": "colors",
+      "status": "established",
+      "property": "background-color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#0f1011",
+          "light": "#eceef0"
+        }
+      }
+    },
+    {
+      "id": "COLOR-INK",
+      "category": "colors",
+      "status": "established",
+      "property": "color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#e9eaec",
+          "light": "#0e0f11"
+        }
+      }
+    },
+    {
+      "id": "COLOR-FAINT",
+      "category": "colors",
+      "status": "established",
+      "property": "color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#7a7e85",
+          "light": "#63686f"
+        }
+      }
+    },
+    {
+      "id": "COLOR-LABEL",
+      "category": "colors",
+      "status": "established",
+      "property": "color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#7a7e85",
+          "light": "#63686f"
+        }
+      }
+    },
+    {
+      "id": "COLOR-LEDE",
+      "category": "colors",
+      "status": "established",
+      "property": "color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#9a9ea6",
+          "light": "#555a62"
+        }
+      }
+    },
+    {
+      "id": "COLOR-DESC",
+      "category": "colors",
+      "status": "established",
+      "property": "color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#9a9ea6",
+          "light": "#555a62"
+        }
+      }
+    },
+    {
+      "id": "COLOR-GHOST",
+      "category": "colors",
+      "status": "established",
+      "property": "color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#2a2c30",
+          "light": "#d9dce0"
+        }
+      }
+    },
+    {
+      "id": "COLOR-TOP-LINE",
+      "category": "colors",
+      "status": "established",
+      "property": "border-bottom-color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#222427",
+          "light": "#dcdfe3"
+        }
+      }
+    },
+    {
+      "id": "COLOR-ROW-LINE",
+      "category": "colors",
+      "status": "established",
+      "property": "border-bottom-color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#222427",
+          "light": "#dcdfe3"
+        }
+      }
+    },
+    {
+      "id": "COLOR-STRONG-LINK",
+      "category": "colors",
+      "status": "established",
+      "property": "border-top-color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#383b40",
+          "light": "#bfc3c9"
+        }
+      }
+    },
+    {
+      "id": "COLOR-STRONG-SPEC",
+      "category": "colors",
+      "status": "established",
+      "property": "border-top-color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#383b40",
+          "light": "#bfc3c9"
+        }
+      }
+    },
+    {
+      "id": "COLOR-SECTION",
+      "category": "colors",
+      "status": "established",
+      "property": "border-bottom-color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#e9eaec",
+          "light": "#0e0f11"
+        }
+      }
+    },
+    {
+      "id": "COLOR-STATS",
+      "category": "colors",
+      "status": "established",
+      "property": "border-top-color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#e9eaec",
+          "light": "#0e0f11"
+        }
+      }
+    },
+    {
+      "id": "TYPE-DISPLAY-FAMILY",
+      "category": "typography",
+      "status": "established",
+      "property": "font-family",
+      "expectation": {
+        "kind": "font-family",
+        "value": "Instrument Sans",
+        "aliases": [
+          "Instrument Sans Variable"
+        ]
+      }
+    },
+    {
+      "id": "TYPE-DISPLAY-WEIGHT",
+      "category": "typography",
+      "status": "established",
+      "property": "font-weight",
+      "expectation": {
+        "kind": "number",
+        "value": 700
+      }
+    },
+    {
+      "id": "TYPE-DISPLAY-SIZE",
+      "category": "typography",
+      "status": "established",
+      "property": "font-size",
+      "expectation": {
+        "kind": "clamp-vw",
+        "min": 44,
+        "vw": 7.4,
+        "max": 108
+      }
+    },
+    {
+      "id": "TYPE-DISPLAY-LINE",
+      "category": "typography",
+      "status": "established",
+      "property": "line-height",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": 0.95,
+        "fontSize": {
+          "kind": "clamp-vw",
+          "min": 44,
+          "vw": 7.4,
+          "max": 108
+        }
+      }
+    },
+    {
+      "id": "TYPE-DISPLAY-TRACK",
+      "category": "typography",
+      "status": "established",
+      "property": "letter-spacing",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": -0.055,
+        "fontSize": {
+          "kind": "clamp-vw",
+          "min": 44,
+          "vw": 7.4,
+          "max": 108
+        }
+      }
+    },
+    {
+      "id": "TYPE-PROJECT-FAMILY",
+      "category": "typography",
+      "status": "established",
+      "property": "font-family",
+      "expectation": {
+        "kind": "font-family",
+        "value": "Instrument Sans",
+        "aliases": [
+          "Instrument Sans Variable"
+        ]
+      }
+    },
+    {
+      "id": "TYPE-PROJECT-WEIGHT",
+      "category": "typography",
+      "status": "established",
+      "property": "font-weight",
+      "expectation": {
+        "kind": "number",
+        "value": 600
+      }
+    },
+    {
+      "id": "TYPE-PROJECT-SIZE",
+      "category": "typography",
+      "status": "established",
+      "property": "font-size",
+      "expectation": {
+        "kind": "clamp-vw",
+        "min": 26,
+        "vw": 2.8,
+        "max": 36
+      }
+    },
+    {
+      "id": "TYPE-PROJECT-LINE",
+      "category": "typography",
+      "status": "established",
+      "property": "line-height",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": 1.05,
+        "fontSize": {
+          "kind": "clamp-vw",
+          "min": 26,
+          "vw": 2.8,
+          "max": 36
+        }
+      }
+    },
+    {
+      "id": "TYPE-PROJECT-TRACK",
+      "category": "typography",
+      "status": "established",
+      "property": "letter-spacing",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": -0.035,
+        "fontSize": {
+          "kind": "clamp-vw",
+          "min": 26,
+          "vw": 2.8,
+          "max": 36
+        }
+      }
+    },
+    {
+      "id": "TYPE-STAT-FAMILY",
+      "category": "typography",
+      "status": "established",
+      "property": "font-family",
+      "expectation": {
+        "kind": "font-family",
+        "value": "Instrument Sans",
+        "aliases": [
+          "Instrument Sans Variable"
+        ]
+      }
+    },
+    {
+      "id": "TYPE-STAT-WEIGHT",
+      "category": "typography",
+      "status": "established",
+      "property": "font-weight",
+      "expectation": {
+        "kind": "number",
+        "value": 600
+      }
+    },
+    {
+      "id": "TYPE-STAT-SIZE",
+      "category": "typography",
+      "status": "established",
+      "property": "font-size",
+      "expectation": {
+        "kind": "clamp-vw",
+        "min": 32,
+        "vw": 4.4,
+        "max": 56
+      }
+    },
+    {
+      "id": "TYPE-STAT-LINE",
+      "category": "typography",
+      "status": "established",
+      "property": "line-height",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": 1,
+        "fontSize": {
+          "kind": "clamp-vw",
+          "min": 32,
+          "vw": 4.4,
+          "max": 56
+        }
+      }
+    },
+    {
+      "id": "TYPE-STAT-TRACK",
+      "category": "typography",
+      "status": "established",
+      "property": "letter-spacing",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": -0.04,
+        "fontSize": {
+          "kind": "clamp-vw",
+          "min": 32,
+          "vw": 4.4,
+          "max": 56
+        }
+      }
+    },
+    {
+      "id": "TYPE-H3-FAMILY",
+      "category": "typography",
+      "status": "established",
+      "property": "font-family",
+      "expectation": {
+        "kind": "font-family",
+        "value": "Instrument Sans",
+        "aliases": [
+          "Instrument Sans Variable"
+        ]
+      }
+    },
+    {
+      "id": "TYPE-H3-WEIGHT",
+      "category": "typography",
+      "status": "established",
+      "property": "font-weight",
+      "expectation": {
+        "kind": "number",
+        "value": 600
+      }
+    },
+    {
+      "id": "TYPE-H3-SIZE",
+      "category": "typography",
+      "status": "established",
+      "property": "font-size",
+      "expectation": {
+        "kind": "px",
+        "value": 20
+      }
+    },
+    {
+      "id": "TYPE-H3-LINE",
+      "category": "typography",
+      "status": "established",
+      "property": "line-height",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": 1.25,
+        "fontSize": {
+          "kind": "px",
+          "value": 20
+        }
+      }
+    },
+    {
+      "id": "TYPE-H3-TRACK",
+      "category": "typography",
+      "status": "established",
+      "property": "letter-spacing",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": -0.02,
+        "fontSize": {
+          "kind": "px",
+          "value": 20
+        }
+      }
+    },
+    {
+      "id": "TYPE-SECTION-FAMILY",
+      "category": "typography",
+      "status": "established",
+      "property": "font-family",
+      "expectation": {
+        "kind": "font-family",
+        "value": "Instrument Sans",
+        "aliases": [
+          "Instrument Sans Variable"
+        ]
+      }
+    },
+    {
+      "id": "TYPE-SECTION-WEIGHT",
+      "category": "typography",
+      "status": "established",
+      "property": "font-weight",
+      "expectation": {
+        "kind": "number",
+        "value": 600
+      }
+    },
+    {
+      "id": "TYPE-SECTION-SIZE",
+      "category": "typography",
+      "status": "established",
+      "property": "font-size",
+      "expectation": {
+        "kind": "px",
+        "value": 15
+      }
+    },
+    {
+      "id": "TYPE-SECTION-LINE",
+      "category": "typography",
+      "status": "established",
+      "property": "line-height",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": 1.3,
+        "fontSize": {
+          "kind": "px",
+          "value": 15
+        }
+      }
+    },
+    {
+      "id": "TYPE-LEDE-FAMILY",
+      "category": "typography",
+      "status": "established",
+      "property": "font-family",
+      "expectation": {
+        "kind": "font-family",
+        "value": "Instrument Sans",
+        "aliases": [
+          "Instrument Sans Variable"
+        ]
+      }
+    },
+    {
+      "id": "TYPE-LEDE-WEIGHT",
+      "category": "typography",
+      "status": "established",
+      "property": "font-weight",
+      "expectation": {
+        "kind": "number",
+        "value": 400
+      }
+    },
+    {
+      "id": "TYPE-LEDE-SIZE",
+      "category": "typography",
+      "status": "established",
+      "property": "font-size",
+      "expectation": {
+        "kind": "px",
+        "value": 19
+      }
+    },
+    {
+      "id": "TYPE-LEDE-LINE",
+      "category": "typography",
+      "status": "established",
+      "property": "line-height",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": 1.55,
+        "fontSize": {
+          "kind": "px",
+          "value": 19
+        }
+      }
+    },
+    {
+      "id": "TYPE-DATA-FAMILY",
+      "category": "typography",
+      "status": "established",
+      "property": "font-family",
+      "expectation": {
+        "kind": "font-family",
+        "value": "IBM Plex Mono"
+      }
+    },
+    {
+      "id": "TYPE-DATA-WEIGHT",
+      "category": "typography",
+      "status": "established",
+      "property": "font-weight",
+      "expectation": {
+        "kind": "number",
+        "value": 500
+      }
+    },
+    {
+      "id": "TYPE-DATA-SIZE",
+      "category": "typography",
+      "status": "established",
+      "property": "font-size",
+      "expectation": {
+        "kind": "px",
+        "value": 14
+      }
+    },
+    {
+      "id": "TYPE-DATA-LINE",
+      "category": "typography",
+      "status": "established",
+      "property": "line-height",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": 1.4,
+        "fontSize": {
+          "kind": "px",
+          "value": 14
+        }
+      }
+    },
+    {
+      "id": "TYPE-LABEL-FAMILY",
+      "category": "typography",
+      "status": "established",
+      "property": "font-family",
+      "expectation": {
+        "kind": "font-family",
+        "value": "IBM Plex Mono"
+      }
+    },
+    {
+      "id": "TYPE-LABEL-WEIGHT",
+      "category": "typography",
+      "status": "established",
+      "property": "font-weight",
+      "expectation": {
+        "kind": "number",
+        "value": 500
+      }
+    },
+    {
+      "id": "TYPE-LABEL-SIZE",
+      "category": "typography",
+      "status": "established",
+      "property": "font-size",
+      "expectation": {
+        "kind": "px",
+        "value": 11
+      }
+    },
+    {
+      "id": "TYPE-LABEL-LINE",
+      "category": "typography",
+      "status": "established",
+      "property": "line-height",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": 1.3,
+        "fontSize": {
+          "kind": "px",
+          "value": 11
+        }
+      }
+    },
+    {
+      "id": "TYPE-LABEL-TRACK",
+      "category": "typography",
+      "status": "established",
+      "property": "letter-spacing",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": 0.08,
+        "fontSize": {
+          "kind": "px",
+          "value": 11
+        }
+      }
+    },
+    {
+      "id": "TYPE-LABEL-CASE",
+      "category": "typography",
+      "status": "established",
+      "property": "text-transform",
+      "expectation": {
+        "kind": "keyword",
+        "value": "uppercase"
+      }
+    },
+    {
+      "id": "TYPE-UI-FONT-FAMILY",
+      "category": "typography",
+      "status": "established",
+      "property": "font-family",
+      "expectation": {
+        "kind": "font-family",
+        "value": "Instrument Sans",
+        "aliases": [
+          "Instrument Sans Variable"
+        ]
+      }
+    },
+    {
+      "id": "TYPE-UI-FONT-SIZE",
+      "category": "typography",
+      "status": "established",
+      "property": "font-size",
+      "expectation": {
+        "kind": "px",
+        "value": 15
+      }
+    },
+    {
+      "id": "TYPE-UI-LINE-HEIGHT",
+      "category": "typography",
+      "status": "established",
+      "property": "line-height",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": 1.5,
+        "fontSize": {
+          "kind": "px",
+          "value": 15
+        }
+      }
+    },
+    {
+      "id": "TYPE-GIANT-FAMILY",
+      "category": "typography",
+      "status": "established",
+      "property": "font-family",
+      "expectation": {
+        "kind": "font-family",
+        "value": "Instrument Sans",
+        "aliases": [
+          "Instrument Sans Variable"
+        ]
+      }
+    },
+    {
+      "id": "TYPE-GIANT-WEIGHT",
+      "category": "typography",
+      "status": "established",
+      "property": "font-weight",
+      "expectation": {
+        "kind": "number",
+        "value": 700
+      }
+    },
+    {
+      "id": "TYPE-HEAD-WRAP",
+      "category": "typography",
+      "status": "established",
+      "property": "text-wrap",
+      "expectation": {
+        "kind": "keyword",
+        "value": "balance"
+      }
+    },
+    {
+      "id": "SPACE-GRID",
+      "category": "spacing",
+      "status": "established",
+      "property": "column-gap",
+      "expectation": {
+        "kind": "px",
+        "value": 24
+      },
+      "condition": {
+        "minWidthExclusive": 820
+      }
+    },
+    {
+      "id": "SHAPE-STRUCTURE-TOP-LEFT",
+      "category": "borders-radii",
+      "status": "established",
+      "property": "border-top-left-radius",
+      "expectation": {
+        "kind": "px",
+        "value": 0
+      }
+    },
+    {
+      "id": "SHAPE-THEME-TOP-LEFT",
+      "category": "borders-radii",
+      "status": "established",
+      "property": "border-top-left-radius",
+      "expectation": {
+        "kind": "px",
+        "value": 4
+      },
+      "condition": {
+        "maxWidth": 820
+      }
+    },
+    {
+      "id": "SHAPE-STRUCTURE-TOP-RIGHT",
+      "category": "borders-radii",
+      "status": "established",
+      "property": "border-top-right-radius",
+      "expectation": {
+        "kind": "px",
+        "value": 0
+      }
+    },
+    {
+      "id": "SHAPE-THEME-TOP-RIGHT",
+      "category": "borders-radii",
+      "status": "established",
+      "property": "border-top-right-radius",
+      "expectation": {
+        "kind": "px",
+        "value": 4
+      },
+      "condition": {
+        "maxWidth": 820
+      }
+    },
+    {
+      "id": "SHAPE-STRUCTURE-BOTTOM-LEFT",
+      "category": "borders-radii",
+      "status": "established",
+      "property": "border-bottom-left-radius",
+      "expectation": {
+        "kind": "px",
+        "value": 0
+      }
+    },
+    {
+      "id": "SHAPE-THEME-BOTTOM-LEFT",
+      "category": "borders-radii",
+      "status": "established",
+      "property": "border-bottom-left-radius",
+      "expectation": {
+        "kind": "px",
+        "value": 4
+      },
+      "condition": {
+        "maxWidth": 820
+      }
+    },
+    {
+      "id": "SHAPE-STRUCTURE-BOTTOM-RIGHT",
+      "category": "borders-radii",
+      "status": "established",
+      "property": "border-bottom-right-radius",
+      "expectation": {
+        "kind": "px",
+        "value": 0
+      }
+    },
+    {
+      "id": "SHAPE-THEME-BOTTOM-RIGHT",
+      "category": "borders-radii",
+      "status": "established",
+      "property": "border-bottom-right-radius",
+      "expectation": {
+        "kind": "px",
+        "value": 4
+      },
+      "condition": {
+        "maxWidth": 820
+      }
+    },
+    {
+      "id": "BORDER-SECTION",
+      "category": "borders-radii",
+      "status": "established",
+      "property": "border-bottom-width",
+      "expectation": {
+        "kind": "px",
+        "value": 1
+      }
+    },
+    {
+      "id": "BORDER-LINK",
+      "category": "borders-radii",
+      "status": "established",
+      "property": "border-top-width",
+      "expectation": {
+        "kind": "px",
+        "value": 1
+      }
+    },
+    {
+      "id": "BORDER-SPEC",
+      "category": "borders-radii",
+      "status": "established",
+      "property": "border-bottom-width",
+      "expectation": {
+        "kind": "px",
+        "value": 1
+      }
+    },
+    {
+      "id": "BORDER-TOP",
+      "category": "borders-radii",
+      "status": "established",
+      "property": "border-bottom-width",
+      "expectation": {
+        "kind": "px",
+        "value": 1
+      }
+    },
+    {
+      "id": "SHADOW-STRUCTURE",
+      "category": "borders-radii",
+      "status": "established",
+      "property": "box-shadow",
+      "expectation": {
+        "kind": "keyword",
+        "value": "none"
+      }
+    },
+    {
+      "id": "LAYOUT-RAIL",
+      "category": "layout",
+      "status": "established",
+      "property": "width",
+      "expectation": {
+        "kind": "px",
+        "value": 300
+      },
+      "condition": {
+        "minWidthExclusive": 820
+      }
+    },
+    {
+      "id": "LAYOUT-CONTENT-CAP",
+      "category": "layout",
+      "status": "established",
+      "property": "width",
+      "expectation": {
+        "kind": "max-px",
+        "value": 1080
+      }
+    },
+    {
+      "id": "LAYOUT-RAIL-STATIC",
+      "category": "layout",
+      "status": "established",
+      "property": "position",
+      "expectation": {
+        "kind": "keyword",
+        "value": "static"
+      },
+      "condition": {
+        "maxWidth": 820
+      }
+    },
+    {
+      "id": "GAP-UI-WEIGHT",
+      "category": "typography",
+      "status": "ambiguous"
+    },
+    {
+      "id": "GAP-GIANT-SIZES",
+      "category": "typography",
+      "status": "ambiguous"
+    },
+    {
+      "id": "GAP-HEBREW-FAMILY",
+      "category": "typography",
+      "status": "ambiguous"
+    },
+    {
+      "id": "GAP-TABLE-TOP-TOKEN",
+      "category": "colors",
+      "status": "ambiguous"
+    },
+    {
+      "id": "GAP-NESTED-MOBILE",
+      "category": "layout",
+      "status": "ambiguous"
+    },
+    {
+      "id": "GAP-EXTRA-BREAKPOINTS",
+      "category": "layout",
+      "status": "missing-guidance"
+    },
+    {
+      "id": "DEFER-INTERACTIONS",
+      "category": "layout",
+      "status": "deferred"
+    },
+    {
+      "id": "UNCHECKED-GRID-TRACKS",
+      "category": "layout",
+      "status": "established",
+      "property": "grid-template-columns",
+      "expectation": {
+        "kind": "unsupported",
+        "expression": "Semantic 12-column structure without assuming one CSS implementation."
+      }
+    },
+    {
+      "id": "UNCHECKED-PROJECT-RELATION",
+      "category": "layout",
+      "status": "established",
+      "property": "layout-relation",
+      "expectation": {
+        "kind": "unsupported",
+        "expression": "At <=1080px spec table below text; one project-row column at <=820px."
+      }
+    },
+    {
+      "id": "UNCHECKED-INTRO-RELATION",
+      "category": "layout",
+      "status": "established",
+      "property": "layout-relation",
+      "expectation": {
+        "kind": "unsupported",
+        "expression": "Prose columns 1-7 and side notes/link rows 9-12; intro full width <=1080px."
+      }
+    },
+    {
+      "id": "UNCHECKED-LEFT-ALIGN",
+      "category": "layout",
+      "status": "established",
+      "property": "layout-relation",
+      "expectation": {
+        "kind": "unsupported",
+        "expression": "Content aligned left, wide-screen whitespace on right."
+      }
+    },
+    {
+      "id": "UNCHECKED-PSEUDO-PAINT",
+      "category": "typography",
+      "status": "established",
+      "property": "pseudo-paint",
+      "expectation": {
+        "kind": "unsupported",
+        "expression": "Decorative pseudo-element glyph paint and status-shape appearance."
+      }
+    },
+    {
+      "id": "UNCHECKED-NUMERALS",
+      "category": "typography",
+      "status": "established",
+      "property": "font-variant-numeric",
+      "expectation": {
+        "kind": "unsupported",
+        "expression": "Every number tabular; per-number/glyph coverage not yet implemented."
+      }
+    }
+  ]
+}

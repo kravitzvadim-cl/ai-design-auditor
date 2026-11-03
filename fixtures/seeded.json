@@ -1,0 +1,193 @@
+{
+  "schemaVersion": "1.0",
+  "evidenceKind": "synthetic",
+  "baseline": {
+    "id": "synthetic-synthetic-first-five",
+    "version": "1.0.0",
+    "coverage": "partial",
+    "sources": [
+      {
+        "id": "synthetic-synthetic-first-five-reference",
+        "url": "https://example.com/design-system/",
+        "snapshot": "fixtures/references/synthetic-first-five-0.json",
+        "sha256": "892c5ed2bcf1437a92d122b2e55836e3e28dc667bc850b364f1ec392da380b5b"
+      }
+    ],
+    "rules": [
+      {
+        "id": "COLOR-BG",
+        "category": "colors",
+        "status": "established",
+        "selector": "body",
+        "property": "background-color",
+        "source": {
+          "id": "synthetic-synthetic-first-five-reference",
+          "anchor": "ds-colour"
+        },
+        "expectation": {
+          "kind": "color",
+          "value": {
+            "dark": "#0b0c0d",
+            "light": "#f4f5f6"
+          }
+        }
+      },
+      {
+        "id": "TYPE-DISPLAY",
+        "category": "typography",
+        "status": "established",
+        "selector": "h1.display",
+        "property": "font-size",
+        "source": {
+          "id": "synthetic-synthetic-first-five-reference",
+          "anchor": "ds-type"
+        },
+        "expectation": {
+          "kind": "clamp-vw",
+          "min": 44,
+          "vw": 7.4,
+          "max": 108
+        }
+      },
+      {
+        "id": "SPACE-GRID",
+        "category": "spacing",
+        "status": "established",
+        "selector": ".g12",
+        "property": "column-gap",
+        "source": {
+          "id": "synthetic-synthetic-first-five-reference",
+          "anchor": "ds-space"
+        },
+        "expectation": {
+          "kind": "px",
+          "value": 24
+        },
+        "condition": {
+          "minWidthExclusive": 820
+        }
+      },
+      {
+        "id": "BORDER-SECTION",
+        "category": "borders-radii",
+        "status": "established",
+        "selector": ".sec",
+        "property": "border-bottom-width",
+        "source": {
+          "id": "synthetic-synthetic-first-five-reference",
+          "anchor": "ds-principles"
+        },
+        "expectation": {
+          "kind": "px",
+          "value": 1
+        }
+      },
+      {
+        "id": "LAYOUT-RAIL",
+        "category": "layout",
+        "status": "established",
+        "selector": ".rail",
+        "property": "width",
+        "source": {
+          "id": "synthetic-synthetic-first-five-reference",
+          "anchor": "ds-space"
+        },
+        "expectation": {
+          "kind": "px",
+          "value": 300
+        },
+        "condition": {
+          "minWidthExclusive": 820
+        }
+      }
+    ]
+  },
+  "runs": [
+    {
+      "id": "dark-1440",
+      "pageUrl": "http://127.0.0.1:4321/",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "deviceScaleFactor": 1
+      },
+      "theme": "dark",
+      "status": "captured",
+      "observations": [
+        {
+          "ruleId": "COLOR-BG",
+          "element": "body[fixture=1]",
+          "state": "measured",
+          "value": "rgb(255, 0, 0)"
+        },
+        {
+          "ruleId": "TYPE-DISPLAY",
+          "element": "h1.display[fixture=1]",
+          "state": "measured",
+          "value": "106.56px"
+        },
+        {
+          "ruleId": "SPACE-GRID",
+          "element": ".g12[fixture=1]",
+          "state": "measured",
+          "value": "24px"
+        },
+        {
+          "ruleId": "BORDER-SECTION",
+          "element": ".sec[fixture=1]",
+          "state": "measured",
+          "value": "1px"
+        },
+        {
+          "ruleId": "LAYOUT-RAIL",
+          "element": ".rail[fixture=1]",
+          "state": "measured",
+          "value": "300px"
+        }
+      ]
+    },
+    {
+      "id": "light-1440",
+      "pageUrl": "http://127.0.0.1:4321/",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "deviceScaleFactor": 1
+      },
+      "theme": "light",
+      "status": "captured",
+      "observations": [
+        {
+          "ruleId": "COLOR-BG",
+          "element": "body[fixture=1]",
+          "state": "measured",
+          "value": "rgb(244 245 246 / 1)"
+        },
+        {
+          "ruleId": "TYPE-DISPLAY",
+          "element": "h1.display[fixture=1]",
+          "state": "measured",
+          "value": "106.56px"
+        },
+        {
+          "ruleId": "SPACE-GRID",
+          "element": ".g12[fixture=1]",
+          "state": "measured",
+          "value": "24px"
+        },
+        {
+          "ruleId": "BORDER-SECTION",
+          "element": ".sec[fixture=1]",
+          "state": "measured",
+          "value": "1px"
+        },
+        {
+          "ruleId": "LAYOUT-RAIL",
+          "element": ".rail[fixture=1]",
+          "state": "measured",
+          "value": "300px"
+        }
+      ]
+    }
+  ]
+}

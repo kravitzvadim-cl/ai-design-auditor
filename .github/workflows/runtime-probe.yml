@@ -1,0 +1,18 @@
+name: Container feasibility
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Build exact runtime
+        run: docker build -f Dockerfile.runtime-check -t auditor-runtime-check .
+      - name: Offline Chromium check at free-tier-sized limits
+        # No privileged mode, added capabilities, custom seccomp or disabled
+        # Chromium sandbox. Failure is evidence, not permission to weaken it.
+        run: docker run --rm --init --memory=512m --memory-swap=512m --cpus=.1 --network=none auditor-runtime-check

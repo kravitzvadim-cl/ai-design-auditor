@@ -1,0 +1,179 @@
+{
+  "evidence": "Synthetic test reference, written for controlled fixtures. Not a snapshot or audit of a real portfolio.",
+  "rules": [
+    {
+      "id": "COLOR-INK",
+      "category": "colors",
+      "status": "established",
+      "property": "color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#e9eaec",
+          "light": "#0e0f11"
+        }
+      }
+    },
+    {
+      "id": "COLOR-FAINT",
+      "category": "colors",
+      "status": "established",
+      "property": "color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#7a7e85",
+          "light": "#63686f"
+        }
+      }
+    },
+    {
+      "id": "COLOR-LABEL",
+      "category": "colors",
+      "status": "established",
+      "property": "color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#7a7e85",
+          "light": "#63686f"
+        }
+      }
+    },
+    {
+      "id": "COLOR-LEDE",
+      "category": "colors",
+      "status": "established",
+      "property": "color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#9a9ea6",
+          "light": "#555a62"
+        }
+      }
+    },
+    {
+      "id": "COLOR-DESC",
+      "category": "colors",
+      "status": "established",
+      "property": "color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#9a9ea6",
+          "light": "#555a62"
+        }
+      }
+    },
+    {
+      "id": "COLOR-GHOST",
+      "category": "colors",
+      "status": "established",
+      "property": "color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#2a2c30",
+          "light": "#d9dce0"
+        }
+      }
+    },
+    {
+      "id": "TYPE-DISPLAY-SIZE",
+      "category": "typography",
+      "status": "established",
+      "property": "font-size",
+      "expectation": {
+        "kind": "clamp-vw",
+        "min": 44,
+        "vw": 7.4,
+        "max": 108
+      }
+    },
+    {
+      "id": "TYPE-PROJECT-SIZE",
+      "category": "typography",
+      "status": "established",
+      "property": "font-size",
+      "expectation": {
+        "kind": "clamp-vw",
+        "min": 26,
+        "vw": 2.8,
+        "max": 36
+      }
+    },
+    {
+      "id": "TYPE-STAT-SIZE",
+      "category": "typography",
+      "status": "established",
+      "property": "font-size",
+      "expectation": {
+        "kind": "clamp-vw",
+        "min": 32,
+        "vw": 4.4,
+        "max": 56
+      }
+    },
+    {
+      "id": "TYPE-H3-SIZE",
+      "category": "typography",
+      "status": "established",
+      "property": "font-size",
+      "expectation": {
+        "kind": "px",
+        "value": 20
+      }
+    },
+    {
+      "id": "TYPE-SECTION-SIZE",
+      "category": "typography",
+      "status": "established",
+      "property": "font-size",
+      "expectation": {
+        "kind": "px",
+        "value": 15
+      }
+    },
+    {
+      "id": "TYPE-LEDE-SIZE",
+      "category": "typography",
+      "status": "established",
+      "property": "font-size",
+      "expectation": {
+        "kind": "px",
+        "value": 19
+      }
+    },
+    {
+      "id": "TYPE-DATA-SIZE",
+      "category": "typography",
+      "status": "established",
+      "property": "font-size",
+      "expectation": {
+        "kind": "px",
+        "value": 14
+      }
+    },
+    {
+      "id": "TYPE-LABEL-SIZE",
+      "category": "typography",
+      "status": "established",
+      "property": "font-size",
+      "expectation": {
+        "kind": "px",
+        "value": 11
+      }
+    },
+    {
+      "id": "TYPE-UI-FONT-SIZE",
+      "category": "typography",
+      "status": "established",
+      "property": "font-size",
+      "expectation": {
+        "kind": "px",
+        "value": 15
+      }
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+.DS_Store
+node_modules/
+dist/
+reports/
+.env
+.env.*
+!.env.example
+*.tsbuildinfo
+.impeccable/questions/
+.impeccable/mocks/
+
+.impeccable/review/
+
+# Local slide-generation intermediates; keep delivered PPTX and validation.
+/output/presentations/.build-*/
+
+# Credential/key material is local only. Never force-add it.
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Never publish internal working notes or release exports.
+docs/history/
+publication-receipts/

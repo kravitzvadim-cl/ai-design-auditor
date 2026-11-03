@@ -1,0 +1,66 @@
+{
+  "evidence": "Synthetic test reference, written for controlled fixtures. Not a snapshot or audit of a real portfolio.",
+  "rules": [
+    {
+      "id": "COLOR-BG",
+      "category": "colors",
+      "status": "established",
+      "property": "background-color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#0b0c0d",
+          "light": "#f4f5f6"
+        }
+      }
+    },
+    {
+      "id": "TYPE-DISPLAY",
+      "category": "typography",
+      "status": "established",
+      "property": "font-size",
+      "expectation": {
+        "kind": "clamp-vw",
+        "min": 44,
+        "vw": 7.4,
+        "max": 108
+      }
+    },
+    {
+      "id": "SPACE-GRID",
+      "category": "spacing",
+      "status": "established",
+      "property": "column-gap",
+      "expectation": {
+        "kind": "px",
+        "value": 24
+      },
+      "condition": {
+        "minWidthExclusive": 820
+      }
+    },
+    {
+      "id": "BORDER-SECTION",
+      "category": "borders-radii",
+      "status": "established",
+      "property": "border-bottom-width",
+      "expectation": {
+        "kind": "px",
+        "value": 1
+      }
+    },
+    {
+      "id": "LAYOUT-RAIL",
+      "category": "layout",
+      "status": "established",
+      "property": "width",
+      "expectation": {
+        "kind": "px",
+        "value": 300
+      },
+      "condition": {
+        "minWidthExclusive": 820
+      }
+    }
+  ]
+}

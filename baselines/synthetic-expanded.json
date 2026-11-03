@@ -1,0 +1,1582 @@
+{
+  "id": "synthetic-synthetic-expanded",
+  "version": "1.0.0",
+  "coverage": "partial",
+  "sources": [
+    {
+      "id": "synthetic-synthetic-expanded-reference",
+      "url": "https://example.com/design-system/",
+      "snapshot": "fixtures/references/synthetic-expanded-0.json",
+      "sha256": "742cda6d453c3bee42c4d0d053c22e69a8c7cd779c09e34f1950ec03b545850c"
+    },
+    {
+      "id": "synthetic-responsive-rules",
+      "url": "https://example.com/design-system/",
+      "snapshot": "fixtures/references/synthetic-expanded-1.json",
+      "sha256": "49cd97385e403ff34892071a9497bccc9e2e754f5d717c29d0213981f19d7087"
+    }
+  ],
+  "rules": [
+    {
+      "id": "COLOR-BG",
+      "category": "colors",
+      "status": "established",
+      "selector": "body",
+      "property": "background-color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#0b0c0d",
+          "light": "#f4f5f6"
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-colour"
+      }
+    },
+    {
+      "id": "COLOR-RAIL",
+      "category": "colors",
+      "status": "established",
+      "selector": ".rail",
+      "property": "background-color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#0f1011",
+          "light": "#eceef0"
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-colour"
+      }
+    },
+    {
+      "id": "COLOR-INK",
+      "category": "colors",
+      "status": "established",
+      "selector": "body, h1.display",
+      "property": "color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#e9eaec",
+          "light": "#0e0f11"
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-colour"
+      }
+    },
+    {
+      "id": "COLOR-FAINT",
+      "category": "colors",
+      "status": "established",
+      "selector": ".display .g",
+      "property": "color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#7a7e85",
+          "light": "#63686f"
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-colour"
+      }
+    },
+    {
+      "id": "COLOR-LABEL",
+      "category": "colors",
+      "status": "established",
+      "selector": ".k, .tbl th",
+      "property": "color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#7a7e85",
+          "light": "#63686f"
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-colour"
+      }
+    },
+    {
+      "id": "COLOR-LEDE",
+      "category": "colors",
+      "status": "established",
+      "selector": ".lede",
+      "property": "color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#9a9ea6",
+          "light": "#555a62"
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-colour"
+      }
+    },
+    {
+      "id": "COLOR-DESC",
+      "category": "colors",
+      "status": "established",
+      "selector": ".prow .desc, .two > div > p:not(.k), .how p",
+      "property": "color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#9a9ea6",
+          "light": "#555a62"
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-colour"
+      }
+    },
+    {
+      "id": "COLOR-GHOST",
+      "category": "colors",
+      "status": "established",
+      "selector": ".prow .big",
+      "property": "color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#2a2c30",
+          "light": "#d9dce0"
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-colour"
+      }
+    },
+    {
+      "id": "COLOR-TOP-LINE",
+      "category": "colors",
+      "status": "established",
+      "selector": ".top",
+      "property": "border-bottom-color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#222427",
+          "light": "#dcdfe3"
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-colour"
+      }
+    },
+    {
+      "id": "COLOR-ROW-LINE",
+      "category": "colors",
+      "status": "established",
+      "selector": ".prow, .spec > div",
+      "property": "border-bottom-color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#222427",
+          "light": "#dcdfe3"
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-colour"
+      }
+    },
+    {
+      "id": "COLOR-STRONG-LINK",
+      "category": "colors",
+      "status": "established",
+      "selector": ".lr",
+      "property": "border-top-color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#383b40",
+          "light": "#bfc3c9"
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-colour"
+      }
+    },
+    {
+      "id": "COLOR-STRONG-SPEC",
+      "category": "colors",
+      "status": "established",
+      "selector": ".spec",
+      "property": "border-top-color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#383b40",
+          "light": "#bfc3c9"
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-colour"
+      }
+    },
+    {
+      "id": "COLOR-SECTION",
+      "category": "colors",
+      "status": "established",
+      "selector": ".sec",
+      "property": "border-bottom-color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#e9eaec",
+          "light": "#0e0f11"
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-colour"
+      }
+    },
+    {
+      "id": "COLOR-STATS",
+      "category": "colors",
+      "status": "established",
+      "selector": ".stats",
+      "property": "border-top-color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#e9eaec",
+          "light": "#0e0f11"
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-colour"
+      }
+    },
+    {
+      "id": "TYPE-DISPLAY-FAMILY",
+      "category": "typography",
+      "status": "established",
+      "selector": "h1.display",
+      "property": "font-family",
+      "expectation": {
+        "kind": "font-family",
+        "value": "Instrument Sans",
+        "aliases": [
+          "Instrument Sans Variable"
+        ]
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-DISPLAY-WEIGHT",
+      "category": "typography",
+      "status": "established",
+      "selector": "h1.display",
+      "property": "font-weight",
+      "expectation": {
+        "kind": "number",
+        "value": 700
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-DISPLAY-SIZE",
+      "category": "typography",
+      "status": "established",
+      "selector": "h1.display",
+      "property": "font-size",
+      "expectation": {
+        "kind": "clamp-vw",
+        "min": 44,
+        "vw": 7.4,
+        "max": 108
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-DISPLAY-LINE",
+      "category": "typography",
+      "status": "established",
+      "selector": "h1.display",
+      "property": "line-height",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": 0.95,
+        "fontSize": {
+          "kind": "clamp-vw",
+          "min": 44,
+          "vw": 7.4,
+          "max": 108
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-DISPLAY-TRACK",
+      "category": "typography",
+      "status": "established",
+      "selector": "h1.display",
+      "property": "letter-spacing",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": -0.055,
+        "fontSize": {
+          "kind": "clamp-vw",
+          "min": 44,
+          "vw": 7.4,
+          "max": 108
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-PROJECT-FAMILY",
+      "category": "typography",
+      "status": "established",
+      "selector": ".prow h2, .prow h3",
+      "property": "font-family",
+      "expectation": {
+        "kind": "font-family",
+        "value": "Instrument Sans",
+        "aliases": [
+          "Instrument Sans Variable"
+        ]
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-PROJECT-WEIGHT",
+      "category": "typography",
+      "status": "established",
+      "selector": ".prow h2, .prow h3",
+      "property": "font-weight",
+      "expectation": {
+        "kind": "number",
+        "value": 600
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-PROJECT-SIZE",
+      "category": "typography",
+      "status": "established",
+      "selector": ".prow h2, .prow h3",
+      "property": "font-size",
+      "expectation": {
+        "kind": "clamp-vw",
+        "min": 26,
+        "vw": 2.8,
+        "max": 36
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-PROJECT-LINE",
+      "category": "typography",
+      "status": "established",
+      "selector": ".prow h2, .prow h3",
+      "property": "line-height",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": 1.05,
+        "fontSize": {
+          "kind": "clamp-vw",
+          "min": 26,
+          "vw": 2.8,
+          "max": 36
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-PROJECT-TRACK",
+      "category": "typography",
+      "status": "established",
+      "selector": ".prow h2, .prow h3",
+      "property": "letter-spacing",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": -0.035,
+        "fontSize": {
+          "kind": "clamp-vw",
+          "min": 26,
+          "vw": 2.8,
+          "max": 36
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-STAT-FAMILY",
+      "category": "typography",
+      "status": "established",
+      "selector": ".stat",
+      "property": "font-family",
+      "expectation": {
+        "kind": "font-family",
+        "value": "Instrument Sans",
+        "aliases": [
+          "Instrument Sans Variable"
+        ]
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-STAT-WEIGHT",
+      "category": "typography",
+      "status": "established",
+      "selector": ".stat",
+      "property": "font-weight",
+      "expectation": {
+        "kind": "number",
+        "value": 600
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-STAT-SIZE",
+      "category": "typography",
+      "status": "established",
+      "selector": ".stat",
+      "property": "font-size",
+      "expectation": {
+        "kind": "clamp-vw",
+        "min": 32,
+        "vw": 4.4,
+        "max": 56
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-STAT-LINE",
+      "category": "typography",
+      "status": "established",
+      "selector": ".stat",
+      "property": "line-height",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": 1,
+        "fontSize": {
+          "kind": "clamp-vw",
+          "min": 32,
+          "vw": 4.4,
+          "max": 56
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-STAT-TRACK",
+      "category": "typography",
+      "status": "established",
+      "selector": ".stat",
+      "property": "letter-spacing",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": -0.04,
+        "fontSize": {
+          "kind": "clamp-vw",
+          "min": 32,
+          "vw": 4.4,
+          "max": 56
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-H3-FAMILY",
+      "category": "typography",
+      "status": "established",
+      "selector": ".two h3, .how h3",
+      "property": "font-family",
+      "expectation": {
+        "kind": "font-family",
+        "value": "Instrument Sans",
+        "aliases": [
+          "Instrument Sans Variable"
+        ]
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-H3-WEIGHT",
+      "category": "typography",
+      "status": "established",
+      "selector": ".two h3, .how h3",
+      "property": "font-weight",
+      "expectation": {
+        "kind": "number",
+        "value": 600
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-H3-SIZE",
+      "category": "typography",
+      "status": "established",
+      "selector": ".two h3, .how h3",
+      "property": "font-size",
+      "expectation": {
+        "kind": "px",
+        "value": 20
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-H3-LINE",
+      "category": "typography",
+      "status": "established",
+      "selector": ".two h3, .how h3",
+      "property": "line-height",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": 1.25,
+        "fontSize": {
+          "kind": "px",
+          "value": 20
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-H3-TRACK",
+      "category": "typography",
+      "status": "established",
+      "selector": ".two h3, .how h3",
+      "property": "letter-spacing",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": -0.02,
+        "fontSize": {
+          "kind": "px",
+          "value": 20
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-SECTION-FAMILY",
+      "category": "typography",
+      "status": "established",
+      "selector": ".sec h2",
+      "property": "font-family",
+      "expectation": {
+        "kind": "font-family",
+        "value": "Instrument Sans",
+        "aliases": [
+          "Instrument Sans Variable"
+        ]
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-SECTION-WEIGHT",
+      "category": "typography",
+      "status": "established",
+      "selector": ".sec h2",
+      "property": "font-weight",
+      "expectation": {
+        "kind": "number",
+        "value": 600
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-SECTION-SIZE",
+      "category": "typography",
+      "status": "established",
+      "selector": ".sec h2",
+      "property": "font-size",
+      "expectation": {
+        "kind": "px",
+        "value": 15
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-SECTION-LINE",
+      "category": "typography",
+      "status": "established",
+      "selector": ".sec h2",
+      "property": "line-height",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": 1.3,
+        "fontSize": {
+          "kind": "px",
+          "value": 15
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-LEDE-FAMILY",
+      "category": "typography",
+      "status": "established",
+      "selector": ".lede",
+      "property": "font-family",
+      "expectation": {
+        "kind": "font-family",
+        "value": "Instrument Sans",
+        "aliases": [
+          "Instrument Sans Variable"
+        ]
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-LEDE-WEIGHT",
+      "category": "typography",
+      "status": "established",
+      "selector": ".lede",
+      "property": "font-weight",
+      "expectation": {
+        "kind": "number",
+        "value": 400
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-LEDE-SIZE",
+      "category": "typography",
+      "status": "established",
+      "selector": ".lede",
+      "property": "font-size",
+      "expectation": {
+        "kind": "px",
+        "value": 19
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-LEDE-LINE",
+      "category": "typography",
+      "status": "established",
+      "selector": ".lede",
+      "property": "line-height",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": 1.55,
+        "fontSize": {
+          "kind": "px",
+          "value": 19
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-DATA-FAMILY",
+      "category": "typography",
+      "status": "established",
+      "selector": ".spec > div:not(.status) dd, .tbl td.d",
+      "property": "font-family",
+      "expectation": {
+        "kind": "font-family",
+        "value": "IBM Plex Mono"
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-DATA-WEIGHT",
+      "category": "typography",
+      "status": "established",
+      "selector": ".spec > div:not(.status) dd, .tbl td.d",
+      "property": "font-weight",
+      "expectation": {
+        "kind": "number",
+        "value": 500
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-DATA-SIZE",
+      "category": "typography",
+      "status": "established",
+      "selector": ".spec > div:not(.status) dd, .tbl td.d",
+      "property": "font-size",
+      "expectation": {
+        "kind": "px",
+        "value": 14
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-DATA-LINE",
+      "category": "typography",
+      "status": "established",
+      "selector": ".spec > div:not(.status) dd, .tbl td.d",
+      "property": "line-height",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": 1.4,
+        "fontSize": {
+          "kind": "px",
+          "value": 14
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-LABEL-FAMILY",
+      "category": "typography",
+      "status": "established",
+      "selector": ".k, .tbl th",
+      "property": "font-family",
+      "expectation": {
+        "kind": "font-family",
+        "value": "IBM Plex Mono"
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-LABEL-WEIGHT",
+      "category": "typography",
+      "status": "established",
+      "selector": ".k, .tbl th",
+      "property": "font-weight",
+      "expectation": {
+        "kind": "number",
+        "value": 500
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-LABEL-SIZE",
+      "category": "typography",
+      "status": "established",
+      "selector": ".k, .tbl th",
+      "property": "font-size",
+      "expectation": {
+        "kind": "px",
+        "value": 11
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-LABEL-LINE",
+      "category": "typography",
+      "status": "established",
+      "selector": ".k, .tbl th",
+      "property": "line-height",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": 1.3,
+        "fontSize": {
+          "kind": "px",
+          "value": 11
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-LABEL-TRACK",
+      "category": "typography",
+      "status": "established",
+      "selector": ".k, .tbl th",
+      "property": "letter-spacing",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": 0.08,
+        "fontSize": {
+          "kind": "px",
+          "value": 11
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-LABEL-CASE",
+      "category": "typography",
+      "status": "established",
+      "selector": ".k, .tbl th",
+      "property": "text-transform",
+      "expectation": {
+        "kind": "keyword",
+        "value": "uppercase"
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-UI-FONT-FAMILY",
+      "category": "typography",
+      "status": "established",
+      "selector": ".rnav a, .rnav button, .lr, .spec dt",
+      "property": "font-family",
+      "expectation": {
+        "kind": "font-family",
+        "value": "Instrument Sans",
+        "aliases": [
+          "Instrument Sans Variable"
+        ]
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-UI-FONT-SIZE",
+      "category": "typography",
+      "status": "established",
+      "selector": ".rnav a, .rnav button, .lr, .spec dt",
+      "property": "font-size",
+      "expectation": {
+        "kind": "px",
+        "value": 15
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-UI-LINE-HEIGHT",
+      "category": "typography",
+      "status": "established",
+      "selector": ".rnav a, .rnav button, .lr, .spec dt",
+      "property": "line-height",
+      "expectation": {
+        "kind": "font-relative",
+        "factor": 1.5,
+        "fontSize": {
+          "kind": "px",
+          "value": 15
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-GIANT-FAMILY",
+      "category": "typography",
+      "status": "established",
+      "selector": ".prow .big",
+      "property": "font-family",
+      "expectation": {
+        "kind": "font-family",
+        "value": "Instrument Sans",
+        "aliases": [
+          "Instrument Sans Variable"
+        ]
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-GIANT-WEIGHT",
+      "category": "typography",
+      "status": "established",
+      "selector": ".prow .big",
+      "property": "font-weight",
+      "expectation": {
+        "kind": "number",
+        "value": 700
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-HEAD-WRAP",
+      "category": "typography",
+      "status": "established",
+      "selector": "h1.display, .prow h2, .prow h3, .two h3, .how h3",
+      "property": "text-wrap",
+      "expectation": {
+        "kind": "keyword",
+        "value": "balance"
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "SPACE-ROW-TOP-WIDE",
+      "category": "spacing",
+      "status": "established",
+      "selector": ".prow",
+      "property": "padding-top",
+      "expectation": {
+        "kind": "px",
+        "value": 40
+      },
+      "source": {
+        "id": "synthetic-responsive-rules",
+        "anchor": "ds-space"
+      },
+      "condition": {
+        "minWidthExclusive": 820
+      }
+    },
+    {
+      "id": "SPACE-ROW-BOTTOM-WIDE",
+      "category": "spacing",
+      "status": "established",
+      "selector": ".prow",
+      "property": "padding-bottom",
+      "expectation": {
+        "kind": "px",
+        "value": 40
+      },
+      "source": {
+        "id": "synthetic-responsive-rules",
+        "anchor": "ds-space"
+      },
+      "condition": {
+        "minWidthExclusive": 820
+      }
+    },
+    {
+      "id": "SPACE-SECTION-WIDE",
+      "category": "spacing",
+      "status": "established",
+      "selector": ".sec",
+      "property": "margin-top",
+      "expectation": {
+        "kind": "px",
+        "value": 120
+      },
+      "source": {
+        "id": "synthetic-responsive-rules",
+        "anchor": "ds-space"
+      },
+      "condition": {
+        "minWidthExclusive": 820
+      }
+    },
+    {
+      "id": "SPACE-ROW-TOP-NARROW",
+      "category": "spacing",
+      "status": "established",
+      "selector": ".prow",
+      "property": "padding-top",
+      "expectation": {
+        "kind": "px",
+        "value": 32
+      },
+      "source": {
+        "id": "synthetic-responsive-rules",
+        "anchor": "ds-space"
+      },
+      "condition": {
+        "maxWidth": 820
+      }
+    },
+    {
+      "id": "SPACE-ROW-BOTTOM-NARROW",
+      "category": "spacing",
+      "status": "established",
+      "selector": ".prow",
+      "property": "padding-bottom",
+      "expectation": {
+        "kind": "px",
+        "value": 32
+      },
+      "source": {
+        "id": "synthetic-responsive-rules",
+        "anchor": "ds-space"
+      },
+      "condition": {
+        "maxWidth": 820
+      }
+    },
+    {
+      "id": "SPACE-SECTION-NARROW",
+      "category": "spacing",
+      "status": "established",
+      "selector": ".sec",
+      "property": "margin-top",
+      "expectation": {
+        "kind": "px",
+        "value": 72
+      },
+      "source": {
+        "id": "synthetic-responsive-rules",
+        "anchor": "ds-space"
+      },
+      "condition": {
+        "maxWidth": 820
+      }
+    },
+    {
+      "id": "SPACE-GRID",
+      "category": "spacing",
+      "status": "established",
+      "selector": ".g12",
+      "property": "column-gap",
+      "expectation": {
+        "kind": "px",
+        "value": 24
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-space"
+      },
+      "condition": {
+        "minWidthExclusive": 820
+      }
+    },
+    {
+      "id": "SHAPE-STRUCTURE-TOP-LEFT",
+      "category": "borders-radii",
+      "status": "established",
+      "selector": ".rail, .main-in, .sec, .prow, .spec, .stats, .two, .how, .tbl",
+      "property": "border-top-left-radius",
+      "expectation": {
+        "kind": "px",
+        "value": 0
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-space"
+      }
+    },
+    {
+      "id": "SHAPE-THEME-TOP-LEFT",
+      "category": "borders-radii",
+      "status": "established",
+      "selector": ".theme-mini",
+      "property": "border-top-left-radius",
+      "expectation": {
+        "kind": "px",
+        "value": 4
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-space"
+      },
+      "condition": {
+        "maxWidth": 820
+      }
+    },
+    {
+      "id": "SHAPE-STRUCTURE-TOP-RIGHT",
+      "category": "borders-radii",
+      "status": "established",
+      "selector": ".rail, .main-in, .sec, .prow, .spec, .stats, .two, .how, .tbl",
+      "property": "border-top-right-radius",
+      "expectation": {
+        "kind": "px",
+        "value": 0
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-space"
+      }
+    },
+    {
+      "id": "SHAPE-THEME-TOP-RIGHT",
+      "category": "borders-radii",
+      "status": "established",
+      "selector": ".theme-mini",
+      "property": "border-top-right-radius",
+      "expectation": {
+        "kind": "px",
+        "value": 4
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-space"
+      },
+      "condition": {
+        "maxWidth": 820
+      }
+    },
+    {
+      "id": "SHAPE-STRUCTURE-BOTTOM-LEFT",
+      "category": "borders-radii",
+      "status": "established",
+      "selector": ".rail, .main-in, .sec, .prow, .spec, .stats, .two, .how, .tbl",
+      "property": "border-bottom-left-radius",
+      "expectation": {
+        "kind": "px",
+        "value": 0
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-space"
+      }
+    },
+    {
+      "id": "SHAPE-THEME-BOTTOM-LEFT",
+      "category": "borders-radii",
+      "status": "established",
+      "selector": ".theme-mini",
+      "property": "border-bottom-left-radius",
+      "expectation": {
+        "kind": "px",
+        "value": 4
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-space"
+      },
+      "condition": {
+        "maxWidth": 820
+      }
+    },
+    {
+      "id": "SHAPE-STRUCTURE-BOTTOM-RIGHT",
+      "category": "borders-radii",
+      "status": "established",
+      "selector": ".rail, .main-in, .sec, .prow, .spec, .stats, .two, .how, .tbl",
+      "property": "border-bottom-right-radius",
+      "expectation": {
+        "kind": "px",
+        "value": 0
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-space"
+      }
+    },
+    {
+      "id": "SHAPE-THEME-BOTTOM-RIGHT",
+      "category": "borders-radii",
+      "status": "established",
+      "selector": ".theme-mini",
+      "property": "border-bottom-right-radius",
+      "expectation": {
+        "kind": "px",
+        "value": 4
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-space"
+      },
+      "condition": {
+        "maxWidth": 820
+      }
+    },
+    {
+      "id": "BORDER-SECTION",
+      "category": "borders-radii",
+      "status": "established",
+      "selector": ".sec",
+      "property": "border-bottom-width",
+      "expectation": {
+        "kind": "px",
+        "value": 1
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-principles"
+      }
+    },
+    {
+      "id": "BORDER-LINK",
+      "category": "borders-radii",
+      "status": "established",
+      "selector": ".lr",
+      "property": "border-top-width",
+      "expectation": {
+        "kind": "px",
+        "value": 1
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-principles"
+      }
+    },
+    {
+      "id": "BORDER-SPEC",
+      "category": "borders-radii",
+      "status": "established",
+      "selector": ".spec > div",
+      "property": "border-bottom-width",
+      "expectation": {
+        "kind": "px",
+        "value": 1
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-principles"
+      }
+    },
+    {
+      "id": "BORDER-TOP",
+      "category": "borders-radii",
+      "status": "established",
+      "selector": ".top",
+      "property": "border-bottom-width",
+      "expectation": {
+        "kind": "px",
+        "value": 1
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-principles"
+      }
+    },
+    {
+      "id": "SHADOW-STRUCTURE",
+      "category": "borders-radii",
+      "status": "established",
+      "selector": ".rail, .main-in, .sec, .prow, .spec, .stats, .two, .how, .tbl",
+      "property": "box-shadow",
+      "expectation": {
+        "kind": "keyword",
+        "value": "none"
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-space"
+      }
+    },
+    {
+      "id": "LAYOUT-RAIL",
+      "category": "layout",
+      "status": "established",
+      "selector": ".rail",
+      "property": "width",
+      "expectation": {
+        "kind": "px",
+        "value": 300
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-space"
+      },
+      "condition": {
+        "minWidthExclusive": 820
+      }
+    },
+    {
+      "id": "LAYOUT-CONTENT-CAP",
+      "category": "layout",
+      "status": "established",
+      "selector": ".main-in",
+      "property": "width",
+      "expectation": {
+        "kind": "max-px",
+        "value": 1080
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-space"
+      }
+    },
+    {
+      "id": "LAYOUT-RAIL-STATIC",
+      "category": "layout",
+      "status": "established",
+      "selector": ".rail",
+      "property": "position",
+      "expectation": {
+        "kind": "keyword",
+        "value": "static"
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-space"
+      },
+      "condition": {
+        "maxWidth": 820
+      }
+    },
+    {
+      "id": "GAP-UI-WEIGHT",
+      "category": "typography",
+      "status": "ambiguous",
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      },
+      "reason": "UI weight is documented as 400 or 500 with no complete assignment.",
+      "recommendation": "Assign weight by navigation, link and table-key role."
+    },
+    {
+      "id": "GAP-GIANT-SIZES",
+      "category": "typography",
+      "status": "ambiguous",
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      },
+      "reason": "96/64/48px giant-number variants do not explicitly name their width boundaries.",
+      "recommendation": "Confirm whether the 1080px and 820px boundaries select those variants."
+    },
+    {
+      "id": "GAP-HEBREW-FAMILY",
+      "category": "typography",
+      "status": "ambiguous",
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      },
+      "reason": "The typeface table third name is a Hebrew example, while references name Heebo; CSS primary-family checks do not prove Hebrew fallback glyph usage.",
+      "recommendation": "Correct the family label and define fallback/glyph verification."
+    },
+    {
+      "id": "GAP-TABLE-TOP-TOKEN",
+      "category": "colors",
+      "status": "ambiguous",
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-parts"
+      },
+      "reason": "Color usage assigns table top rules to line-strong; the Table part describes a full-strength rule, also used for ink section rules.",
+      "recommendation": "Clarify actual table-header versus spec-table token assignments."
+    },
+    {
+      "id": "GAP-NESTED-MOBILE",
+      "category": "layout",
+      "status": "ambiguous",
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-space"
+      },
+      "reason": "Everything is one column at 820px leaves nested method/stat layouts and documented component exceptions incompletely scoped.",
+      "recommendation": "Name the exact structures covered and any nested exceptions."
+    },
+    {
+      "id": "GAP-EXTRA-BREAKPOINTS",
+      "category": "layout",
+      "status": "missing-guidance",
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-space"
+      },
+      "reason": "Implementation contains additional 700px/520px transitions absent from the published breakpoint list.",
+      "recommendation": "Document their component scope before enforcing expected behavior at those widths."
+    },
+    {
+      "id": "DEFER-INTERACTIONS",
+      "category": "layout",
+      "status": "deferred",
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-motion"
+      },
+      "reason": "Hover, focus, search-open, animation and interaction states are deliberately outside static M1.",
+      "recommendation": "Evaluate in a later interaction-state milestone."
+    },
+    {
+      "id": "UNCHECKED-GRID-TRACKS",
+      "category": "layout",
+      "status": "established",
+      "selector": ".g12",
+      "property": "grid-template-columns",
+      "expectation": {
+        "kind": "unsupported",
+        "expression": "Semantic 12-column structure without assuming one CSS implementation."
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-space"
+      }
+    },
+    {
+      "id": "UNCHECKED-PROJECT-RELATION",
+      "category": "layout",
+      "status": "established",
+      "selector": ".prow .spec",
+      "property": "layout-relation",
+      "expectation": {
+        "kind": "unsupported",
+        "expression": "At <=1080px spec table below text; one project-row column at <=820px."
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-space"
+      }
+    },
+    {
+      "id": "UNCHECKED-INTRO-RELATION",
+      "category": "layout",
+      "status": "established",
+      "selector": ".intro",
+      "property": "layout-relation",
+      "expectation": {
+        "kind": "unsupported",
+        "expression": "Prose columns 1-7 and side notes/link rows 9-12; intro full width <=1080px."
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-space"
+      }
+    },
+    {
+      "id": "UNCHECKED-LEFT-ALIGN",
+      "category": "layout",
+      "status": "established",
+      "selector": ".main-in",
+      "property": "layout-relation",
+      "expectation": {
+        "kind": "unsupported",
+        "expression": "Content aligned left, wide-screen whitespace on right."
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-space"
+      }
+    },
+    {
+      "id": "UNCHECKED-PSEUDO-PAINT",
+      "category": "typography",
+      "status": "established",
+      "selector": ".prow .big",
+      "property": "pseudo-paint",
+      "expectation": {
+        "kind": "unsupported",
+        "expression": "Decorative pseudo-element glyph paint and status-shape appearance."
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-colour"
+      }
+    },
+    {
+      "id": "UNCHECKED-NUMERALS",
+      "category": "typography",
+      "status": "established",
+      "selector": "body",
+      "property": "font-variant-numeric",
+      "expectation": {
+        "kind": "unsupported",
+        "expression": "Every number tabular; per-number/glyph coverage not yet implemented."
+      },
+      "source": {
+        "id": "synthetic-synthetic-expanded-reference",
+        "anchor": "ds-type"
+      }
+    }
+  ]
+}

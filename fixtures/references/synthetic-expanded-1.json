@@ -1,0 +1,83 @@
+{
+  "evidence": "Synthetic test reference, written for controlled fixtures. Not a snapshot or audit of a real portfolio.",
+  "rules": [
+    {
+      "id": "SPACE-ROW-TOP-WIDE",
+      "category": "spacing",
+      "status": "established",
+      "property": "padding-top",
+      "expectation": {
+        "kind": "px",
+        "value": 40
+      },
+      "condition": {
+        "minWidthExclusive": 820
+      }
+    },
+    {
+      "id": "SPACE-ROW-BOTTOM-WIDE",
+      "category": "spacing",
+      "status": "established",
+      "property": "padding-bottom",
+      "expectation": {
+        "kind": "px",
+        "value": 40
+      },
+      "condition": {
+        "minWidthExclusive": 820
+      }
+    },
+    {
+      "id": "SPACE-SECTION-WIDE",
+      "category": "spacing",
+      "status": "established",
+      "property": "margin-top",
+      "expectation": {
+        "kind": "px",
+        "value": 120
+      },
+      "condition": {
+        "minWidthExclusive": 820
+      }
+    },
+    {
+      "id": "SPACE-ROW-TOP-NARROW",
+      "category": "spacing",
+      "status": "established",
+      "property": "padding-top",
+      "expectation": {
+        "kind": "px",
+        "value": 32
+      },
+      "condition": {
+        "maxWidth": 820
+      }
+    },
+    {
+      "id": "SPACE-ROW-BOTTOM-NARROW",
+      "category": "spacing",
+      "status": "established",
+      "property": "padding-bottom",
+      "expectation": {
+        "kind": "px",
+        "value": 32
+      },
+      "condition": {
+        "maxWidth": 820
+      }
+    },
+    {
+      "id": "SPACE-SECTION-NARROW",
+      "category": "spacing",
+      "status": "established",
+      "property": "margin-top",
+      "expectation": {
+        "kind": "px",
+        "value": 72
+      },
+      "condition": {
+        "maxWidth": 820
+      }
+    }
+  ]
+}

@@ -1,0 +1,271 @@
+{
+  "id": "synthetic-synthetic-text",
+  "version": "1.0.0",
+  "coverage": "partial",
+  "sources": [
+    {
+      "id": "synthetic-synthetic-text-reference",
+      "url": "https://example.com/design-system/",
+      "snapshot": "fixtures/references/synthetic-text-0.json",
+      "sha256": "73d9f33cffd25ffaa4b19f8c7f50f1cd3888d7bcfd66c8a4d678f8639216f975"
+    },
+    {
+      "id": "synthetic-responsive-rules",
+      "url": "https://example.com/design-system/",
+      "snapshot": "fixtures/references/synthetic-text-1.json",
+      "sha256": "041a1fb39d3225a16d5146b72541fc6fa99ad62ae27f35f49434b4c8f93b55ee"
+    }
+  ],
+  "rules": [
+    {
+      "id": "COLOR-INK",
+      "category": "colors",
+      "status": "established",
+      "selector": "body, h1.display",
+      "property": "color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#e9eaec",
+          "light": "#0e0f11"
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-text-reference",
+        "anchor": "ds-colour"
+      }
+    },
+    {
+      "id": "COLOR-FAINT",
+      "category": "colors",
+      "status": "established",
+      "selector": ".display .g",
+      "property": "color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#7a7e85",
+          "light": "#63686f"
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-text-reference",
+        "anchor": "ds-colour"
+      }
+    },
+    {
+      "id": "COLOR-LABEL",
+      "category": "colors",
+      "status": "established",
+      "selector": ".k, .tbl th",
+      "property": "color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#7a7e85",
+          "light": "#63686f"
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-text-reference",
+        "anchor": "ds-colour"
+      }
+    },
+    {
+      "id": "COLOR-LEDE",
+      "category": "colors",
+      "status": "established",
+      "selector": ".lede",
+      "property": "color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#9a9ea6",
+          "light": "#555a62"
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-text-reference",
+        "anchor": "ds-colour"
+      }
+    },
+    {
+      "id": "COLOR-DESC",
+      "category": "colors",
+      "status": "established",
+      "selector": ".prow .desc, .two > div > p:not(.k), .how p",
+      "property": "color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#9a9ea6",
+          "light": "#555a62"
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-text-reference",
+        "anchor": "ds-colour"
+      }
+    },
+    {
+      "id": "COLOR-GHOST",
+      "category": "colors",
+      "status": "established",
+      "selector": ".prow .big",
+      "property": "color",
+      "expectation": {
+        "kind": "color",
+        "value": {
+          "dark": "#2a2c30",
+          "light": "#d9dce0"
+        }
+      },
+      "source": {
+        "id": "synthetic-synthetic-text-reference",
+        "anchor": "ds-colour"
+      }
+    },
+    {
+      "id": "TYPE-DISPLAY-SIZE",
+      "category": "typography",
+      "status": "established",
+      "selector": "h1.display",
+      "property": "font-size",
+      "expectation": {
+        "kind": "clamp-vw",
+        "min": 44,
+        "vw": 7.4,
+        "max": 108
+      },
+      "source": {
+        "id": "synthetic-synthetic-text-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-PROJECT-SIZE",
+      "category": "typography",
+      "status": "established",
+      "selector": ".prow h2, .prow h3",
+      "property": "font-size",
+      "expectation": {
+        "kind": "clamp-vw",
+        "min": 26,
+        "vw": 2.8,
+        "max": 36
+      },
+      "source": {
+        "id": "synthetic-synthetic-text-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-STAT-SIZE",
+      "category": "typography",
+      "status": "established",
+      "selector": ".stat",
+      "property": "font-size",
+      "expectation": {
+        "kind": "clamp-vw",
+        "min": 32,
+        "vw": 4.4,
+        "max": 56
+      },
+      "source": {
+        "id": "synthetic-synthetic-text-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-H3-SIZE",
+      "category": "typography",
+      "status": "established",
+      "selector": ".two h3, .how h3",
+      "property": "font-size",
+      "expectation": {
+        "kind": "px",
+        "value": 20
+      },
+      "source": {
+        "id": "synthetic-synthetic-text-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-SECTION-SIZE",
+      "category": "typography",
+      "status": "established",
+      "selector": ".sec h2",
+      "property": "font-size",
+      "expectation": {
+        "kind": "px",
+        "value": 15
+      },
+      "source": {
+        "id": "synthetic-synthetic-text-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-LEDE-SIZE",
+      "category": "typography",
+      "status": "established",
+      "selector": ".lede",
+      "property": "font-size",
+      "expectation": {
+        "kind": "px",
+        "value": 19
+      },
+      "source": {
+        "id": "synthetic-synthetic-text-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-DATA-SIZE",
+      "category": "typography",
+      "status": "established",
+      "selector": ".spec > div:not(.status) dd, .tbl td.d",
+      "property": "font-size",
+      "expectation": {
+        "kind": "px",
+        "value": 14
+      },
+      "source": {
+        "id": "synthetic-synthetic-text-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-LABEL-SIZE",
+      "category": "typography",
+      "status": "established",
+      "selector": ".k, .tbl th",
+      "property": "font-size",
+      "expectation": {
+        "kind": "px",
+        "value": 11
+      },
+      "source": {
+        "id": "synthetic-synthetic-text-reference",
+        "anchor": "ds-type"
+      }
+    },
+    {
+      "id": "TYPE-UI-FONT-SIZE",
+      "category": "typography",
+      "status": "established",
+      "selector": ".rnav a, .rnav button, .lr, .spec dt",
+      "property": "font-size",
+      "expectation": {
+        "kind": "px",
+        "value": 15
+      },
+      "source": {
+        "id": "synthetic-synthetic-text-reference",
+        "anchor": "ds-type"
+      }
+    }
+  ],
+  "scope": "documented-visual"
+}

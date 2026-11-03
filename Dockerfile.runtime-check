@@ -1,0 +1,13 @@
+FROM node:22.22.3-bookworm-slim
+ENV PLAYWRIGHT_BROWSERS_PATH=/opt/browsers
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --ignore-scripts && npx playwright-core install --with-deps chromium
+COPY tsconfig.json ./
+COPY src ./src
+COPY tools ./tools
+RUN npm run build && npm prune --omit=dev --ignore-scripts && chmod -R a+rX /opt/browsers
+USER node
+ENV NODE_OPTIONS=--max-old-space-size=192
+# An offline feasibility probe, not the hosted application entry point.
+CMD ["node", "dist/tools/check-container-runtime.js"]
