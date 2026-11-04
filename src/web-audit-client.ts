@@ -80,7 +80,9 @@ function renderReport(report:WebReport, reviewedRules = rules){
       const highlight=el('div','','evidence-highlight');
       highlight.setAttribute('aria-hidden','true');
       Object.assign(highlight.style,{left:`${affected.bounds.x}px`,top:`${affected.bounds.y}px`,width:`${affected.bounds.width}px`,height:`${affected.bounds.height}px`});
-      highlight.append(el('span',`Issue ${selected+1}`,'issue-marker'));
+      const marker=el('span',`Issue ${selected+1}`,'issue-marker');
+      marker.style.top=affected.bounds.y >= 24 ? '-24px' : '100%';
+      highlight.append(marker);
       frame.append(image,highlight);
       const occupied = new Set([`${affected.bounds.x},${affected.bounds.y}`]);
       for (const [index, issue] of report.differences.entries()) {
@@ -95,7 +97,7 @@ function renderReport(report:WebReport, reviewedRules = rules){
         pin.type = 'button';
         pin.setAttribute('aria-label', `Show issue ${index + 1}`);
         pin.style.left = `${bounds.x}px`;
-        pin.style.top = `${bounds.y}px`;
+        pin.style.top = `${bounds.y >= 28 ? bounds.y - 28 : bounds.y + bounds.height}px`;
         pin.onclick = () => {
           selected = index; location = point; show();
           (list.children[index] as HTMLButtonElement).focus({preventScroll:true});
