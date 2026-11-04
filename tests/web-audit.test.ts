@@ -89,6 +89,12 @@ test('browser runs an automatic audit and marks issues without mapping checkboxe
     await p.getByRole('heading',{name:'2 design errors',exact:true}).waitFor();
     await progress.waitFor({state:'hidden'});
     assert.equal(await p.getByRole('link',{name:'Findings',exact:true}).getAttribute('aria-current'),'step');
+    assert.equal(await p.locator('.audit-brand .proof-pin-mark').count(),1);
+    assert.match(await p.locator('link[rel=icon]').getAttribute('href')??'',/Proof%20Pin/);
+    await p.emulateMedia({reducedMotion:'reduce'});
+    assert.equal(await p.locator('.report-arrival').evaluate(el=>getComputedStyle(el).animationName),'none');
+    await p.emulateMedia({reducedMotion:'no-preference'});
+
     await p.getByText('Adjust what was checked',{exact:true}).waitFor();
     assert.equal(await p.locator('#mapping-panel').getAttribute('open'),null);
     assert.equal(await p.getByRole('button',{name:'Show issue 1',exact:true}).isVisible(),true);

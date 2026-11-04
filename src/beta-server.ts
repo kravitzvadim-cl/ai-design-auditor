@@ -3,11 +3,11 @@ import type { IncomingMessage } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { intakeHandler } from './intake-server.js';
 import type { IntakeServices } from './intake-server.js';
-import { auditPalette, intakeHTML, intakeStyle } from './intake-view.js';
+import { auditPalette, intakeHTML, intakeStyle, proofPinFavicon, proofPinMark } from './intake-view.js';
 import { accessToken, SupabaseUnavailable, SupabaseWorkspace, uuid } from './supabase-workspace.js';
 
 const escape = (value: string) => value.replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]!);
-const page = (title: string, body: string) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${escape(title)} · AI Auditor</title><style>${intakeStyle}${auditPalette}</style></head><body class="audit-theme"><header class="header"><div class="brand">AI Auditor</div><span>Invited beta</span></header><main style="max-width:600px"><section class="panel"><h1>${escape(title)}</h1>${body}</section></main></body></html>`;
+const page = (title: string, body: string) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${escape(title)} · AI Auditor</title>${proofPinFavicon}<style>${intakeStyle}${auditPalette}</style></head><body class="audit-theme"><header class="header"><div class="brand">${proofPinMark}<span>AI Auditor</span></div><span>Invited beta</span></header><main style="max-width:600px"><section class="panel"><h1>${escape(title)}</h1>${body}</section></main></body></html>`;
 const signOutForm = '<form method="post" action="/sign-out"><button type="submit">Sign out</button></form>';
 const passwordField = (autocomplete: string, minimum: number) => `<div class="field"><label for="password">Password</label><input id="password" name="password" type="password" required minlength="${minimum}" maxlength="128" autocomplete="${autocomplete}"></div>`;
 const signInPage = (notice = '') => page('Sign in', `<p>Use the email address on your invitation.</p>${notice ? `<p class="status" role="status">${escape(notice)}</p>` : ''}<form method="post" action="/sign-in"><div class="field"><label for="email">Email</label><input id="email" name="email" type="email" required maxlength="254" autocomplete="username"></div>${passwordField('current-password', 1)}<div class="actions"><button class="primary" type="submit">Sign in</button></div></form>`);

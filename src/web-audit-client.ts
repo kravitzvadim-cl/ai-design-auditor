@@ -80,7 +80,7 @@ async function showAudit(version:number,automatic:boolean){
   message('Checking text against your design system…');
   const report:WebReport=await post('/api/audit',{systemId,targetId,automatic,mappings,reviewed:!automatic});
   if(version!==generation)return;
-  renderReport(report);
+  renderReport(report, rules, true);
   message(report.checked ? 'Audit complete.' : 'No text could be checked. See the coverage details in the report.');
   if(isPrivateWorkspace)document.dispatchEvent(new Event('library-updated'));
 }
@@ -93,9 +93,10 @@ export function reopenReport(report: WebReport, reviewedRules: IntakeRule[]) {
 }
 
 let stopTrackingEvidence=()=>{};
-function renderReport(report:WebReport, reviewedRules = rules){
+function renderReport(report:WebReport, reviewedRules = rules, fresh = false){
   stopTrackingEvidence();
   const root=get('web-results');root.replaceChildren();root.append(el('h2',!report.checked?'No selected text could be checked':report.differences.length?`${report.differences.length} design ${report.differences.length===1?'error':'errors'}`:'No errors in the selected checks'),el('p',report.url,'report-url'),el('p','The report covers text the app could check against your design system.','hint'));
+  if(fresh)root.firstElementChild?.classList.add('report-arrival');
   if(!report.checked)root.append(el('p','Capture the page again after checking its access and loading issues, or select text that can be measured. No conformance result is available.','status error'));
   if(report.unchecked.length||report.unmappedRules.length){const details=el('details','','coverage');details.open=!report.checked;details.append(el('summary','What was not checked'));for(const line of report.unchecked)details.append(el('p',line));if(report.unmappedRules.length)details.append(el('p',`Text styles without a match: ${report.unmappedRules.join(', ')}`));root.append(details);}
   if(report.differences.length){
