@@ -42,7 +42,8 @@ export function betaServer(origin: string, supabase: SupabaseWorkspace, services
     const json = (status: number, error: string) => { response.writeHead(status, { 'Content-Type': 'application/json' }); response.end(JSON.stringify({ error })); };
     const redirect = (location: string) => { response.writeHead(303, { Location: location }); response.end(); };
     response.setHeader('Cache-Control', 'no-store');
-    response.setHeader('Referrer-Policy', 'no-referrer');
+    // Keep same-origin form POSTs identifiable without sending referrers off-site.
+    response.setHeader('Referrer-Policy', 'same-origin');
     response.setHeader('X-Content-Type-Options', 'nosniff');
     response.setHeader('X-Robots-Tag', 'noindex');
     response.setHeader('Content-Security-Policy', "default-src 'none'; script-src 'self'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'");
