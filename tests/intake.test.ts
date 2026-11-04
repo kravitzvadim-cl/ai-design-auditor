@@ -4,7 +4,7 @@ import { mkdtemp, readFile, rm, readdir, symlink, mkdir } from 'node:fs/promises
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { chromium } from 'playwright-core';
-import { extractRules, sourceFromText, readAsset, figmaRules } from '../src/intake.js';
+import { extractRules, sourceFromText, readAsset, figmaRules, htmlText } from '../src/intake.js';
 import { checkedUrl, publicAddress, figmaLocation, readLink } from '../src/intake-network.js';
 import { intakeServer } from '../src/intake-server.js';
 
@@ -19,6 +19,26 @@ test('intake extracts explicit text-size/color rules and keeps ambiguous values 
   const token = extractRules(JSON.stringify({ body: { $type: 'dimension', $value: { value: 16, unit: 'px' } }, textColor: { $type: 'color', $value: '#333' } }), 'tokens'); assert.ok(token.some(r => r.color === '#333'));
   const unrelated = extractRules('The type scale uses a line height in a multiple of 5px.\nThe tablet breakpoint (640px).\nUse the brand token rather than #1d70b8.\nFor example, blue could be #1d70b8.\nLetter spacing: 2px', 'public-doc');
   assert.deepEqual(unrelated, [], 'Documentation prose must not turn excluded properties or examples into text rules.');
+});
+
+test('HTML colour tables preserve row context and only import text roles', () => {
+  const html = `<table>
+    <tr>
+      <th><span style="background-color:#123456"></span>
+        <code>text</code></th>
+      <td><code>#123456</code></td>
+    </tr>
+    <tr><th>link</th><td>#216087</td></tr>
+    <tr><th>link-hover</th><td>#112233</td></tr>
+    <tr><th>body-background</th><td>#ffffff</td></tr>
+    <tr><th>primary</th><td>#333333</td></tr>
+    <tr><th>Heading</th><td>20px</td></tr>
+  </table>`;
+  const rules = extractRules(htmlText(html), 'table');
+  assert.deepEqual(rules.map(rule => [rule.name, rule.color, rule.size]), [
+    ['Body text', '#123456', ''], ['Link', '#216087', ''], ['Heading', '', '20px'],
+  ]);
+  assert.match(rules[0]!.evidence, /text \| #123456/);
 });
 
 test('source readers preserve provenance and treat unknown files honestly', async () => {

@@ -58,7 +58,18 @@ export function extractRules(text: string, sourceId: string): IntakeRule[] {
     if ([...line.matchAll(new RegExp(sizePattern.source, 'gi'))].length > 1 || [...line.matchAll(new RegExp(colorPattern.source, 'gi'))].length > 1) continue;
     const size = sizePattern.exec(line)?.[0] ?? ''; const color = colorPattern.exec(line)?.[0] ?? '';
     const firstValue = Math.min(...[size ? line.indexOf(size) : Infinity, color ? line.indexOf(color) : Infinity]);
-    if (Number.isFinite(firstValue)) add(line.slice(0, firstValue).replace(/[|,:=\s-]+$/, ''), size, color, line);
+    if (!Number.isFinite(firstValue)) continue;
+    let name = line.slice(0, firstValue).replace(/[|,:=\s-]+$/, '').trim();
+    if (color && !size && line.includes('|')) {
+      // A palette row needs a text role before it can become a text-color rule.
+      // Link interaction states need state-aware measurements and stay out.
+      const token = name.replace(/^[|\s`]+|[|`\s]+$/g, '').toLowerCase();
+      if (!/^(?:text|body(?:[ -]text)?|(?:primary|secondary|inverse|surface)[ -]text|(?:default[ -])?link|text[ -]colou?r)$/.test(token)) continue;
+      if (['text', 'body', 'text color', 'text colour'].includes(token)) name = 'Body text';
+      else if (['link', 'default link', 'default-link'].includes(token)) name = 'Link';
+      else name = token.replaceAll('-', ' ').replace(/^./, char => char.toUpperCase());
+    }
+    add(name, size, color, line);
   }
   return result.slice(0, 150);
 }
@@ -97,7 +108,16 @@ export async function readAsset(name: string, bytes: Buffer, mediaType: string):
   } finally { await rm(folder, { recursive: true, force: true }); }
 }
 export function htmlText(html: string): string {
-  return html.replace(/<(script|style|noscript)\b[^>]*>[\s\S]*?<\/\1>/gi, '').replace(/<\/(?:td|th)>/gi, ' | ').replace(/<(?:br\s*\/?|\/(?:p|div|tr|li|h[1-6]|section))>/gi, '\n').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&').replace(/&lt;/gi, '<').replace(/&gt;/gi, '>').replace(/&quot;/gi, '"').replace(/[ \t]+/g, ' ');
+  return html.replace(/<(script|style|noscript)\b[^>]*>[\s\S]*?<\/\1>/gi, '')
+    .replace(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi, (_row, content: string) => {
+      const cells = [...content.matchAll(/<(td|th)\b[^>]*>([\s\S]*?)<\/\1>/gi)]
+        .map(cell => cell[2]!.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim());
+      return '\n' + cells.join(' | ') + '\n';
+    })
+    .replace(/<\/(?:td|th)>/gi, ' | ')
+    .replace(/<(?:br\s*\/?|\/(?:p|div|tr|li|h[1-6]|section))>/gi, '\n')
+    .replace(/<[^>]*>/g, ' ').replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<').replace(/&gt;/gi, '>').replace(/&quot;/gi, '"').replace(/[ \t]+/g, ' ');
 }
 export function figmaRules(data: unknown, sourceId: string): IntakeRule[] {
   const rules: IntakeRule[] = [];
