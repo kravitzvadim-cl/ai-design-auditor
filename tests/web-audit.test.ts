@@ -63,7 +63,7 @@ test('public capture uses a guarded reader, rejects local targets, blocks page w
 test('browser runs an automatic audit and marks issues without mapping checkboxes', {timeout:60000},async()=>{
   const directory=await mkdtemp(join(tmpdir(),'auditor-web-flow-'));
   const ai=new CheapInterpreter({key:'test',fetcher:async(_url,options)=>{const body=JSON.parse(String(options?.body));const input=JSON.parse(body.messages[1].content).input;if(input.candidates)return response({mappings:input.rules.map((r:IntakeRule)=>({ruleId:r.id,elementIds:[input.candidates[0].id]}))});return response({rules:[suggestion()],notes:[]});}});
-  const fixtureReader:PublicReader=async url=>({bytes:Buffer.from('<!doctype html><html><head><style>body{margin:20px;font:16px Arial}p{font-size:17px;color:#0b0c0c}p[data-color]{font-size:19px;color:#ff0000}</style></head><body><nav><p>Navigation text</p></nav><main><p>Sample paragraph</p><p data-color>Second paragraph</p></main></body></html>'),type:'text/html',finalUrl:url});
+  const fixtureReader:PublicReader=async url=>({bytes:Buffer.from('<!doctype html><html><head><style>body{margin:20px;font:16px Arial}p{font-size:17px;color:#0b0c0c}p[data-color]{font-size:19px;color:#ff0000}</style></head><body><nav><p>Navigation text</p></nav><main><p>Sample paragraph<br>Continuation</p><p data-color>Second paragraph</p></main></body></html>'),type:'text/html',finalUrl:url});
   const server=intakeServer(directory,{interpreter:ai,inspect:async(url,dir,themes,_reader,sizes)=>{const t=await inspectWebsite(url,dir,themes,fixtureReader,sizes);if(url.includes('/failed'))for(const c of t.captures)c.issues.push('Fixture load failure');return t;}});await new Promise<void>(resolve=>server.listen(0,'127.0.0.1',resolve));
   const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM??chromium.executablePath()});
   try{const p=await browser.newPage({viewport:{width:390,height:844}});const errors:string[]=[];p.on('pageerror',e=>errors.push(e.message));await p.goto(`http://127.0.0.1:${(server.address() as {port:number}).port}`);
@@ -74,14 +74,26 @@ test('browser runs an automatic audit and marks issues without mapping checkboxe
     await p.getByRole('heading',{name:'2 design errors',exact:true}).waitFor();
     await p.getByText('Adjust what was checked',{exact:true}).waitFor();
     assert.equal(await p.locator('#mapping-panel').getAttribute('open'),null);
-    assert.equal(await p.getByText('Issue 1',{exact:true}).isVisible(),true);
+    assert.equal(await p.getByRole('button',{name:'Show issue 1',exact:true}).isVisible(),true);
     assert.match(await p.locator('.error-detail').innerText(),/Suggested fix: change the text size of this text from 17px to 19px/);
     assert.doesNotMatch(await p.locator('.error-detail').innerText(),/Navigation text/);
+    const alignment=async()=>p.locator('.evidence-highlight').first().evaluate(outline=>{
+      const img=document.querySelector<HTMLImageElement>('.evidence-frame img')!;
+      const image=img.getBoundingClientRect(), rect=outline.getBoundingClientRect();
+      return { width:rect.width/image.width, left:(rect.left-image.left)/image.width };
+    });
+    assert.equal(await p.locator('.evidence-highlight').count(),2,'each line has a separate highlight');
+    const fit=await alignment();
+    assert.ok(fit.width < 0.5,'highlight is tighter than the paragraph block');
+    await p.getByRole('button',{name:'Actual size',exact:true}).click();
+    const full=await alignment();
+    assert.ok(Math.abs(fit.left-full.left)<0.002 && Math.abs(fit.width-full.width)<0.002,'highlight aligns at both zoom levels');
+    await p.getByRole('button',{name:'Fit width',exact:true}).click();
     await p.getByRole('button',{name:'Show issue 2',exact:true}).click();
     assert.match(await p.locator('.error-detail').innerText(),/Second paragraph/);
     await p.locator('#web-results .error-index button').first().click();
     assert.equal(await p.locator('#web-results .error-index button').count(),2);assert.equal(await p.getByText('Matches',{exact:true}).count(),0);const image=p.locator('#web-results img');await image.waitFor();await p.waitForFunction(()=>document.querySelector<HTMLImageElement>('#web-results img')?.naturalWidth!>0);assert.ok((await image.getAttribute('src'))?.startsWith('/api/screenshots/'));
-    await p.getByRole('button',{name:'Next affected location',exact:true}).click();assert.match(await p.locator('.error-detail').innerText(),/1440px/);assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);assert.deepEqual(errors,[]);
+    await p.getByRole('button',{name:'Next affected location',exact:true}).click();assert.match(await p.locator('.capture-caption').innerText(),/1440px/);assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);assert.deepEqual(errors,[]);
     const files=await import('node:fs/promises');const targets=await files.readdir(join(directory,'reports/web-audits'));const resultFolder=join(directory,'reports/web-audits',targets[0]!,'results');const ids=await files.readdir(resultFolder);const saved=JSON.parse(await readFile(join(resultFolder,ids[0]!,'report.json'),'utf8'));assert.equal(saved.report.differences.length,2);
     if(process.env.AUDITOR_VISUAL_EVIDENCE){const out=process.env.AUDITOR_VISUAL_EVIDENCE;await mkdir(out,{recursive:true});for(const width of [1440,819,390]){await p.setViewportSize({width,height:900});await p.locator('#web-results').scrollIntoViewIfNeeded();await p.locator('#web-results').screenshot({path:join(out,`errors-${width}.png`)});await p.evaluate(()=>scrollTo(0,0));await p.screenshot({path:join(out,`setup-${width}.png`)});}await files.writeFile(join(out,'fixture-verification.json'),JSON.stringify({fixture:true,widths:[1440,819,390],errors:errors,report:saved.report},null,2));}
 

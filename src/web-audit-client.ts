@@ -62,50 +62,107 @@ export function reopenReport(report: WebReport, reviewedRules: IntakeRule[]) {
   renderReport(report, reviewedRules);
 }
 
+let stopTrackingEvidence=()=>{};
 function renderReport(report:WebReport, reviewedRules = rules){
+  stopTrackingEvidence();
   const root=get('web-results');root.replaceChildren();root.append(el('h2',!report.checked?'No selected text could be checked':report.differences.length?`${report.differences.length} design ${report.differences.length===1?'error':'errors'}`:'No errors in the selected checks'),el('p',report.url,'report-url'),el('p','The report covers text the app could check against your design system.','hint'));
   if(!report.checked)root.append(el('p','Capture the page again after checking its access and loading issues, or select text that can be measured. No conformance result is available.','status error'));
   if(report.unchecked.length||report.unmappedRules.length){const details=el('details','','coverage');details.open=!report.checked;details.append(el('summary','What was not checked'));for(const line of report.unchecked)details.append(el('p',line));if(report.unmappedRules.length)details.append(el('p',`Text styles without a match: ${report.unmappedRules.join(', ')}`));root.append(details);}
-  if(report.differences.length){const workspace=el('div','','error-workspace');const list=el('div','','error-index');list.setAttribute('aria-label','Design errors');const detail=el('section','','error-detail');let selected=0,location=0;
-    const show=()=>{detail.replaceChildren();const difference=report.differences[selected]!;const affected=difference.locations[location]!;const capture=report.captures.find(c=>c.id===affected.captureId)!;
-      for(const [i,b] of [...list.children].entries()){b.classList.toggle('selected',i===selected);b.setAttribute('aria-pressed',String(i===selected));}
-      detail.append(el('h3',`${difference.name}: ${difference.property==='font-size'?'text size':'text color'}`));const values=el('div','','error-values');for(const [label,value] of [['Design system',difference.expected],['On this page',difference.actual]]){const col=el('div');col.append(el('p',label!,'hint'),el('strong',value!));values.append(col);}detail.append(values,el('p',affected.text,'affected-text'),el('p',`Suggested fix: change the ${difference.property==='font-size'?'text size':'text color'} of this text from ${difference.actual} to ${difference.expected}.`));
-      const toolbar=el('div','','actions');toolbar.append(el('span',`${capture.width}px · ${capture.theme} preference · Location ${location+1} of ${difference.locations.length}`,'hint'));const next=el('button','Next affected location');next.type='button';next.disabled=difference.locations.length<2;next.onclick=()=>{location=(location+1)%difference.locations.length;show();detail.querySelector<HTMLButtonElement>('button')?.focus();};toolbar.append(next);detail.append(toolbar);
-      const viewport=el('div','','evidence-viewport');
-      const frame=el('div','','evidence-frame');
-      const image=el('img');
-      image.alt=`Captured page at ${capture.width}px with design issue markers`;
-      image.src=apiPath(`/api/screenshots/${report.targetId}/${capture.id}`);
-      image.style.width=frame.style.width=`${capture.width}px`;
-      const highlight=el('div','','evidence-highlight');
-      highlight.setAttribute('aria-hidden','true');
-      Object.assign(highlight.style,{left:`${affected.bounds.x}px`,top:`${affected.bounds.y}px`,width:`${affected.bounds.width}px`,height:`${affected.bounds.height}px`});
-      const marker=el('span',`Issue ${selected+1}`,'issue-marker');
-      marker.style.top=affected.bounds.y >= 24 ? '-24px' : '100%';
-      highlight.append(marker);
-      frame.append(image,highlight);
-      const occupied = new Set([`${affected.bounds.x},${affected.bounds.y}`]);
-      for (const [index, issue] of report.differences.entries()) {
-        if (index === selected) continue;
-        const point = issue.locations.findIndex(item => item.captureId === capture.id);
-        if (point < 0) continue;
-        const bounds = issue.locations[point]!.bounds;
-        const position = `${bounds.x},${bounds.y}`;
-        if (occupied.has(position)) continue;
-        occupied.add(position);
-        const pin = el('button', String(index + 1), 'issue-marker issue-pin');
-        pin.type = 'button';
-        pin.setAttribute('aria-label', `Show issue ${index + 1}`);
-        pin.style.left = `${bounds.x}px`;
-        pin.style.top = `${bounds.y >= 28 ? bounds.y - 28 : bounds.y + bounds.height}px`;
-        pin.onclick = () => {
-          selected = index; location = point; show();
-          (list.children[index] as HTMLButtonElement).focus({preventScroll:true});
-        };
-        frame.append(pin);
+  if(report.differences.length){
+    const workspace=el('div','','error-workspace');
+    const list=el('div','','error-index');list.setAttribute('aria-label','Design errors');
+    const detail=el('section','','error-detail');
+    const evidence=el('section','','evidence-desk');
+    const toolbar=el('div','','evidence-toolbar');
+    const caption=el('span','','capture-caption');
+    const next=el('button','Next affected location');
+    const zoom=el('button','Actual size');zoom.type='button';
+    toolbar.append(caption,zoom,next);
+    const viewport=el('div','','evidence-viewport');
+    viewport.tabIndex=0;viewport.setAttribute('aria-label','Scrollable page screenshot');
+    const frame=el('div','','evidence-frame');
+    const image=el('img');
+    const marks=el('div','','evidence-marks');
+    frame.append(image,marks);viewport.append(frame);evidence.append(toolbar,viewport);
+    let selected=0,location=0,actualSize=false;
+    const paint=()=>{
+      const width=image.naturalWidth,height=image.naturalHeight;
+      if(!width||!height)return;
+      frame.style.width=actualSize?`${width}px`:`min(100%, ${width}px)`;
+      marks.replaceChildren();
+      const difference=report.differences[selected]!;
+      const affected=difference.locations[location]!;
+      const rects=affected.textRects?.length?affected.textRects:[affected.bounds];
+      const anchor=rects[0]!;
+      for(const rect of rects){
+        const x=Math.max(0,rect.x),y=Math.max(0,rect.y);
+        const right=Math.min(width,rect.x+rect.width),bottom=Math.min(height,rect.y+rect.height);
+        if(right<=x||bottom<=y)continue;
+        const highlight=el('div','','evidence-highlight');
+        highlight.setAttribute('aria-hidden','true');
+        Object.assign(highlight.style,{left:`${x/width*100}%`,top:`${y/height*100}%`,width:`${(right-x)/width*100}%`,height:`${(bottom-y)/height*100}%`});
+        marks.append(highlight);
       }
-      viewport.append(frame);detail.append(viewport);
-      image.onload=()=>{viewport.scrollTop=Math.max(0,affected.bounds.y-80);viewport.scrollLeft=Math.max(0,affected.bounds.x-40);};
+      const occupied=new Set<string>();
+      const pins:{x:number;y:number}[]=[];
+      const scale=frame.clientWidth/width;
+      const pinAt=(index:number,point:number,rect:typeof anchor)=>{
+        const x=Math.max(0,rect.x),y=Math.max(0,rect.y);
+        if(x>=width||y>=height||rect.x+rect.width<=0||rect.y+rect.height<=0)return;
+        const position=`${Math.round(x)},${Math.round(y)}`;
+        if(occupied.has(position))return;
+        occupied.add(position);
+        const pin=el('button',String(index+1),'issue-marker issue-pin');
+        pin.type='button';pin.setAttribute('aria-label',`Show issue ${index+1}`);
+        pin.setAttribute('aria-pressed',String(index===selected));
+        const anchorX=x*scale,anchorY=y*scale;
+        const centerX=Math.max(-12,anchorX-21);
+        let centerY=anchorY;
+        while(pins.some(item=>Math.hypot(item.x-centerX,item.y-centerY)<32))centerY+=32;
+        pins.push({x:centerX,y:centerY});
+        const line=el('span','','issue-leader');
+        line.setAttribute('aria-hidden','true');
+        const dx=centerX-anchorX,dy=centerY-anchorY;
+        Object.assign(line.style,{left:`${anchorX}px`,top:`${anchorY}px`,width:`${Math.hypot(dx,dy)}px`,transform:`rotate(${Math.atan2(dy,dx)}rad)`});
+        pin.style.left=`${centerX}px`;pin.style.top=`${centerY}px`;
+        marks.append(line);
+        pin.onclick=()=>{selected=index;location=point;show();(list.children[index] as HTMLButtonElement).focus({preventScroll:true});};
+        marks.append(pin);
+      };
+      pinAt(selected,location,anchor);
+      for(const [index,issue] of report.differences.entries()){
+        if(index===selected)continue;
+        const point=issue.locations.findIndex(item=>item.captureId===affected.captureId);
+        const item=issue.locations[point];
+        if(item)pinAt(index,point,item.textRects?.[0]??item.bounds);
+      }
+      const x=Math.max(0,anchor.x)*scale,y=Math.max(0,anchor.y)*scale;
+      const insetX=frame.offsetLeft,insetY=frame.offsetTop;
+      if(x+insetX<viewport.scrollLeft+12||x+insetX>viewport.scrollLeft+viewport.clientWidth-36)viewport.scrollLeft=x+insetX-viewport.clientWidth/3;
+      if(y+insetY<viewport.scrollTop+32||y+insetY>viewport.scrollTop+viewport.clientHeight-56)viewport.scrollTop=y+insetY-viewport.clientHeight/3;
+    };
+    image.onload=paint;
+    const resize=new ResizeObserver(()=>{if(image.complete)paint();});
+    resize.observe(viewport);
+    stopTrackingEvidence=()=>resize.disconnect();
+    zoom.onclick=()=>{actualSize=!actualSize;zoom.textContent=actualSize?'Fit width':'Actual size';paint();};
+    const show=()=>{
+      detail.replaceChildren();const difference=report.differences[selected]!;const affected=difference.locations[location]!;const capture=report.captures.find(c=>c.id===affected.captureId)!;
+      for(const [i,b] of [...list.children].entries()){b.classList.toggle('selected',i===selected);b.setAttribute('aria-pressed',String(i===selected));}
+      detail.append(el('h3',`${difference.name}: ${difference.property==='font-size'?'text size':'text color'}`));
+      const values=el('div','','error-values');
+      for(const [label,value] of [['On this page',difference.actual],['Design system',difference.expected]]){
+        const col=el('div');col.append(el('p',label!,'hint'),el('strong',value!));values.append(col);
+      }
+      detail.append(values,el('blockquote',affected.text,'affected-text'),el('p',`Suggested fix: change the ${difference.property==='font-size'?'text size':'text color'} of this text from ${difference.actual} to ${difference.expected}.`,'issue-fix'));
+      caption.textContent=`${capture.width}px · ${capture.theme} preference · Location ${location+1} of ${difference.locations.length}`;
+      next.type='button';next.disabled=difference.locations.length<2;
+      next.onclick=()=>{location=(location+1)%difference.locations.length;show();};
+      image.alt=`Captured page at ${capture.width}px with design issue markers`;
+      const src=apiPath(`/api/screenshots/${report.targetId}/${capture.id}`);
+      if(image.getAttribute('src')!==src){marks.replaceChildren();image.src=src;}
+      else if(image.complete)paint();
+      if(!affected.textRects?.length)detail.append(el('p','This capture shows the element outline. Check the page again for a text-level highlight.','hint'));
       const rule=reviewedRules.find(r=>r.id===difference.ruleId);
       const copy=el('button','Copy issue details');copy.type='button';
       copy.onclick=async()=>{
@@ -126,7 +183,7 @@ function renderReport(report:WebReport, reviewedRules = rules){
       if(affected.selector)provenance.append(el('p',affected.selector));
       provenance.append(el('p',report.limitations.join(' ')));detail.append(provenance);
     };
-    report.differences.forEach((d,i)=>{const button=el('button',`${i+1}. ${d.name}: ${d.property==='font-size'?'text size':'text color'}`);button.type='button';button.onclick=()=>{selected=i;location=0;show();};list.append(button);});workspace.append(list,detail);root.append(workspace);show();
+    report.differences.forEach((d,i)=>{const button=el('button',`${i+1}. ${d.name}: ${d.property==='font-size'?'text size':'text color'}`);button.type='button';button.onclick=()=>{selected=i;location=0;show();};list.append(button);});workspace.append(list,evidence,detail);root.append(workspace);show();
   }
   const download=el('button','Download audit evidence');download.type='button';download.onclick=()=>{const blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=el('a');a.href=url;a.download='audit-report.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};root.append(download);root.hidden=false;root.scrollIntoView({behavior:'instant',block:'start'});
 }
