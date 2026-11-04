@@ -12,9 +12,17 @@ Requires Node.js 22.22+. Install dependencies with npm ci, install the matching 
 
 Run npm test for deterministic fixtures and Chromium integration checks. Tests use no paid AI calls. All committed source references are synthetic; private notes, real uploads/audits and the original working Git history are excluded. Engine compatibility tests cover historical contract types; product audit scope remains font-size/text-color only.
 
+## Private workspace preview
+
+Set the Supabase URL and publishable key from .env.example in ignored .env. Apply the migration under supabase/migrations/ and turn off public signup. Run `npm run beta:preview` and open http://127.0.0.1:4342/. Sign in with an invited account to create projects, save rules, download originals and reopen reports with screenshots. The preview runs the live access checks before starting.
+
+For a test using Supabase's default invitation email, set the Auth Site URL to http://127.0.0.1:4342/activate. Invite an address on the Supabase project team through the dashboard. Open the link on the machine running the preview, choose a password and then sign in. Accounts for external testers need configured SMTP. The preview uses manual interpretation and mapping until persistent AI quotas are in place.
+
+Tests exercise sign-in, active membership, cross-account route denial and reopening saved work after a restart against a simulated Supabase service. A real invited-account test, representative Render workloads and portable document readers remain release checks.
+
 ## Status and limits
 
-Local prototype. A Supabase schema/private bucket and database-level ownership tests are prepared. Hosted invitation/password integration, private file delivery, Linux reader parity and Render resource testing are still in progress. Do not expose the current loopback/single-user server unchanged. macOS PDF/image conversion uses PDFKit/Vision; other platforms currently provide an explicit export/manual fallback until portable readers are verified. Figma links need separate access; screenshots do not prove original CSS font size.
+The local intake and the private workspace preview have separate entry points. The preview listens on loopback. macOS PDF/image conversion uses PDFKit and Vision. Other platforms offer an export or manual fallback while portable readers are in development. Figma links need their own access connection or export.
 
 OpenRouter uses a fixed low-cost model with bounded requests, price ceilings, no automatic expensive fallback and a conservative $0.25 process reservation guard. Restart resets that guard; it is not a hosted user quota. AI sends only the source/page text needed for the requested interpretation.
 
@@ -24,7 +32,7 @@ Source code is public-facing; deployed credentials and user data must remain pri
 
 ## Hosted foundation checks
 
-`supabase/migrations/` defines invited membership, user-owned projects/records and a private file bucket. `supabase/tests/ownership.sql` uses rolled-back synthetic users to assert database isolation and revocation. This does not verify real authentication sessions, file delivery or application persistence. Configure public signup and server authentication separately before deployment.
+`supabase/migrations/` defines invited membership, user-owned projects/records and a private file bucket. `supabase/tests/ownership.sql` uses rolled-back synthetic users to assert database isolation and revocation. The application preview uses the signed-in user session for those same policies. Real hosted sign-in and storage checks are release gates.
 
 The manually triggered Container feasibility workflow builds `Dockerfile.runtime-check` and runs an offline four-capture probe at 512 MiB and 0.1 CPU. It runs as a non-root user with Chromium sandboxing requested, no credentials and no network. A successful probe would cover this controlled sample only, not Render cold starts or arbitrary websites. The image entry point is a probe, not the hosted app.
 

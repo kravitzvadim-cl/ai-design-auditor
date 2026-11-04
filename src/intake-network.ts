@@ -51,10 +51,10 @@ export function figmaLocation(raw: string): { key: string; node: string | null }
   if (node && !/^[0-9:-]{1,100}$/.test(node)) throw new Error('The Figma node identifier is invalid.');
   return { key: match[1]!, node: node?.replace(/-/g, ':') ?? null };
 }
-export async function readLink(raw: string): Promise<IntakeSource> {
+export async function readLink(raw: string, figmaToken = process.env.FIGMA_ACCESS_TOKEN): Promise<IntakeSource> {
   const url = checkedUrl(raw); const figma = figmaLocation(raw);
   if (figma) {
-    const token = process.env.FIGMA_ACCESS_TOKEN;
+    const token = figmaToken;
     if (!token) return { ...sourceFromText(url.href, '', 'Figma', url.href, 'text/uri-list'), state: 'connection-required', message: 'Figma access is not connected on this computer. Configure FIGMA_ACCESS_TOKEN locally, then re-add this link, or upload an export. No file content has been read.' };
     const endpoint = figma.node ? `https://api.figma.com/v1/files/${figma.key}/nodes?ids=${encodeURIComponent(figma.node)}` : `https://api.figma.com/v1/files/${figma.key}`;
     const result = await fetchPublic(endpoint, { 'X-Figma-Token': token });

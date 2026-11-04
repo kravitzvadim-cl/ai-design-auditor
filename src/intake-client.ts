@@ -1,11 +1,12 @@
-import { enableTarget, disableTarget, usage } from './web-audit-client.js';
+import { enableTarget, disableTarget, usage, apiPath, isPrivateWorkspace, reopenReport } from './web-audit-client.js';
+import type { RecordSummary, SavedReport, SavedSystem } from './project-store.js';
 import type { IntakeRule, IntakeSource } from './intake.js';
 const get = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 const sourceList: Omit<IntakeSource, 'original'>[] = []; let rules: IntakeRule[] = []; let busy = false; let aiAvailable = false;
 const element = <K extends keyof HTMLElementTagNameMap>(tag: K, text = '', className = '') => { const node = document.createElement(tag); node.textContent = text; node.className = className; return node; };
 const status = (id: string, message: string, error = false) => { get(id).textContent = message; get(id).classList.toggle('error', error); };
 async function api(path: string, data: unknown): Promise<Record<string, unknown>> {
-  const result = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); const body = await result.json(); if (!result.ok) throw new Error(body.error ?? 'This action could not be completed.'); return body;
+  const result = await fetch(apiPath(path), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); const body = await result.json(); if (!result.ok) throw new Error(body.error ?? 'This action could not be completed.'); return body;
 }
 function changed() { disableTarget(); get<HTMLInputElement>('reviewed').checked = false; get('saved').hidden = true; updateSave(); }
 function updateSave() { get<HTMLButtonElement>('save').disabled = busy || !rules.length || !get<HTMLInputElement>('reviewed').checked || !get<HTMLInputElement>('system-name').value.trim(); get('rule-count').textContent = rules.length ? `${rules.length} text ${rules.length === 1 ? 'rule' : 'rules'}` : 'No rules yet'; }
@@ -18,12 +19,18 @@ function renderSources() {
     const interpret = element('button', 'Interpret with AI'); interpret.type='button';interpret.disabled=!aiAvailable||busy||!source.text.trim();interpret.setAttribute('aria-label',`Interpret ${source.name} with AI`);
     interpret.onclick=()=>void importing(async()=>{
       const start=await api('/api/interpret',{sourceId:source.id});let item=start;
-      while(item.state==='running'){status('import-status','Interpreting explicit text rules with Gemini Flash Lite…');await new Promise(resolve=>setTimeout(resolve,800));const response=await fetch(`/api/jobs/${item.id}`);item=await response.json();if(!response.ok)throw new Error('Task status is unavailable.');}
+      while(item.state==='running'){status('import-status','Interpreting explicit text rules with Gemini Flash Lite…');await new Promise(resolve=>setTimeout(resolve,800));const response=await fetch(apiPath(`/api/jobs/${item.id}`));item=await response.json();if(!response.ok)throw new Error('Task status is unavailable.');}
       if(item.state!=='done')throw new Error(String(item.message));const result=item.result as {rules:IntakeRule[];notes:string[];receipt:{chargedUSD:number|null;cached:boolean}};
       rules=rules.filter(r=>r.sourceId!==source.id);rules.push(...result.rules);source.rules=result.rules;source.message=[`${result.rules.length} AI suggestions. Review values, sources and conditions.`,...result.notes,usage(result.receipt)].join(' ');renderSources();renderRules();changed();
     });
     const actions=element('div','','source-actions');actions.append(interpret,remove);head.append(name, actions); card.append(head, element('p', `${source.kind} · ${source.state === 'connection-required' ? 'Connection needed' : source.state === 'needs-review' ? 'Manual review needed' : 'Ready to review'}`), element('p', source.message));
     if (source.text) { const details = element('details'); details.append(element('summary', 'Read extracted source text'), element('pre', source.text.slice(0, 12000), 'excerpt')); card.append(details); }
+    if (isPrivateWorkspace) {
+      const original = element('a', 'Download original');
+      original.href = apiPath('/api/sources/' + encodeURIComponent(source.id) + '/original');
+      original.download = source.name;
+      card.append(original);
+    }
     list.append(card);
   }
 }
@@ -55,7 +62,7 @@ async function add(data: unknown) {
   return result;
 }
 async function importing(action: () => Promise<void>) {
-  if (busy) return; busy = true; get<HTMLButtonElement>('add-source').disabled = true; get<HTMLButtonElement>('choose-files').disabled = true; updateSave(); status('import-status', 'Reading your source locally…');
+  if (busy) return; busy = true; get<HTMLButtonElement>('add-source').disabled = true; get<HTMLButtonElement>('choose-files').disabled = true; updateSave(); status('import-status', isPrivateWorkspace ? 'Reading your source…' : 'Reading your source locally…');
   try { await action(); status('import-status', 'Source added. Review the suggestions or enter any missing rules.'); } catch (error) { status('import-status', error instanceof Error ? error.message : 'Source could not be read.', true); }
   finally { busy = false; get<HTMLButtonElement>('add-source').disabled = false; get<HTMLButtonElement>('choose-files').disabled = false; renderSources(); updateSave(); }
 }
@@ -78,13 +85,101 @@ const drop = get('drop'); drop.ondragover = event => { event.preventDefault(); d
 get('add-rule').onclick = () => { rules.push({ id: crypto.randomUUID(), name: '', size: '', color: '', theme: 'all', sourceId: 'manual', evidence: 'Owner-entered rule' }); renderRules(); changed(); get('rule-list').lastElementChild?.querySelector('input')?.focus(); };
 get('reviewed').onchange = updateSave; get('system-name').oninput = () => { get('saved').hidden = true; updateSave(); };
 get('save').onclick = async () => {
-  if (get<HTMLButtonElement>('save').disabled) return; busy = true; updateSave(); status('save-status', 'Saving locally…');
+  if (get<HTMLButtonElement>('save').disabled) return; busy = true; updateSave(); status('save-status', isPrivateWorkspace ? 'Saving to your project…' : 'Saving locally…');
   try {
     const saved = await api('/api/save', { name: get<HTMLInputElement>('system-name').value.trim(), rules, sourceIds: sourceList.map(source => source.id), reviewed: true });
-    const panel = get('saved'); panel.replaceChildren(element('h2', 'Design system saved'), element('p', `${saved.name} · Version ${saved.version} · ${Array.isArray(saved.rules) ? saved.rules.length : 0} reviewed text ${Array.isArray(saved.rules)&&saved.rules.length===1?'rule':'rules'}`), element('p', 'Your rules and source snapshots are saved locally. Choose a page below to check against them.'));
-    const path = element('code', String(saved.savedPath)); panel.append(path); const download = element('button', 'Download reviewed rules'); download.style.marginTop = '16px'; download.onclick = () => { const blob = new Blob([JSON.stringify(saved, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = element('a'); a.href = url; a.download = 'design-system.json'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); }; panel.append(element('br'), download); panel.hidden = false; enableTarget(String(saved.id),saved.rules as IntakeRule[]); panel.scrollIntoView({ behavior: 'instant', block: 'start' }); status('save-status', 'Saved. Your original sources have not been changed.');
+    showSaved(saved);
+    if (isPrivateWorkspace) void refreshLibrary();
+    status('save-status', 'Saved. Your original sources have not been changed.');
   } catch (error) { status('save-status', error instanceof Error ? error.message : 'Saving failed.', true); }
   finally { busy = false; updateSave(); }
 };
+function showSaved(saved: Record<string, unknown>) {
+  const panel = get('saved');
+  const savedRules = saved.rules as IntakeRule[];
+  panel.replaceChildren(
+    element('h2', 'Design system saved'),
+    element('p', `${String(saved.name)} · Version ${String(saved.version)} · ${savedRules.length} reviewed text ${savedRules.length === 1 ? 'rule' : 'rules'}`),
+    element('p', isPrivateWorkspace ? 'Your reviewed rules are saved to this project.' : 'Your rules and source snapshots are saved locally. Choose a page below to check against them.'),
+  );
+  if (typeof saved.savedPath === 'string') panel.append(element('code', saved.savedPath), element('br'));
+  const download = element('button', 'Download reviewed rules');
+  download.style.marginTop = '16px';
+  download.onclick = () => {
+    const { sources: _sources, ...rulesOnly } = saved;
+    const url = URL.createObjectURL(new Blob([JSON.stringify(rulesOnly, null, 2)], { type: 'application/json' }));
+    const link = element('a');
+    link.href = url;
+    link.download = 'design-system.json';
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+  panel.append(download);
+  panel.hidden = false;
+  enableTarget(String(saved.id), savedRules);
+  panel.scrollIntoView({ behavior: 'instant', block: 'start' });
+}
+
+async function getPrivate(path: string) {
+  const response = await fetch(apiPath(path));
+  if (response.status === 401) {
+    location.assign('/sign-in');
+    throw new Error('Sign in to reopen your project.');
+  }
+  if (!response.ok) throw new Error('Saved work could not be opened. Try reloading.');
+  return response.json();
+}
+
+async function refreshLibrary() {
+  const library = get('private-library');
+  if (!library) return;
+  try {
+    const { items } = await getPrivate('/api/library') as { items: RecordSummary[] };
+    library.replaceChildren(element('h3', 'Saved work'));
+    if (!items.length) library.append(element('p', 'Saved design systems and reports will appear here.', 'hint'));
+    const links = element('div', '', 'actions');
+    for (const item of items) {
+      const name = item.kind === 'system' ? item.name ?? 'Design system' : item.url ?? 'Website';
+      const button = element('button', `${item.kind === 'system' ? 'Rules' : 'Report'} · ${name}`);
+      button.type = 'button';
+      button.onclick = async () => {
+        if (busy) return;
+        busy = true;
+        updateSave();
+        button.disabled = true;
+        try {
+          if (item.kind === 'system') {
+            const saved = await getPrivate('/api/systems/' + item.id) as SavedSystem & { sources: typeof sourceList };
+            sourceList.splice(0, sourceList.length, ...saved.sources);
+            rules = structuredClone(saved.rules);
+            get<HTMLInputElement>('system-name').value = saved.name;
+            get<HTMLInputElement>('reviewed').checked = true;
+            renderSources();
+            renderRules();
+            showSaved(saved);
+          } else {
+            const saved = await getPrivate('/api/reports/' + item.id) as SavedReport;
+            reopenReport(saved.report, saved.rules);
+          }
+        } catch (error) {
+          library.append(element('p', error instanceof Error ? error.message : 'Saved work could not be opened.', 'status error'));
+        } finally {
+          busy = false;
+          button.disabled = false;
+          updateSave();
+        }
+      };
+      links.append(button);
+    }
+    library.append(links);
+  } catch (error) {
+    library.replaceChildren(element('p', error instanceof Error ? error.message : 'Saved work could not be opened.', 'status error'));
+  }
+}
+
+if (isPrivateWorkspace) {
+  void refreshLibrary();
+  document.addEventListener('library-updated', () => { void refreshLibrary(); });
+}
 renderRules();
-void fetch('/api/status').then(r => r.json()).then(info => { aiAvailable=!!info.ai;get('ai-connection').textContent=info.ai?'Gemini 2.5 Flash Lite connected through OpenRouter. Interpret with AI sends this source’s extracted text to the provider. Session budget: $0.25.':'AI is not connected. Set OPENROUTER_API_KEY in .env and restart the app. Manual rules and capture still work.';renderSources();get('connections').textContent = info.figma ? 'Figma connection configured. Imports use your access permissions.' : 'Figma links can be added. Reading Figma content needs a local connection or an exported file.'; }).catch(() => { get('connections').textContent = 'Connection status is unavailable. Reload to try again.'; });
+void fetch(apiPath('/api/status')).then(r => r.json()).then(info => { aiAvailable=!!info.ai;get('ai-connection').textContent=info.ai?'Gemini 2.5 Flash Lite connected through OpenRouter. Interpret with AI sends this source’s extracted text to the provider. Session budget: $0.25.':isPrivateWorkspace ? 'Review and map the rules manually in this preview.' : 'AI is not connected. Set OPENROUTER_API_KEY in .env and restart the app. Manual rules and capture still work.';renderSources();get('connections').textContent = info.figma ? 'Figma connection configured. Imports use your access permissions.' : 'Figma links can be added. Reading Figma content needs a local connection or an exported file.'; }).catch(() => { get('connections').textContent = 'Connection status is unavailable. Reload to try again.'; });

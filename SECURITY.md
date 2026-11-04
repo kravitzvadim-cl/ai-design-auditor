@@ -1,6 +1,6 @@
 # Security status
 
-This is a local prototype. Do not expose it as a multi-user service before the planned Supabase invitation-only password authentication, server-side ownership checks and private storage policies are implemented and verified. A protected homepage alone is insufficient.
+The private preview verifies the Supabase user and active membership on protected requests. Each project and file request carries the user's access token and relies on the project's ownership policies. Passwords go through Supabase Auth. The preview uses HTTP-only cookies and an exact request origin. HTTPS mode adds the Secure cookie flag. Real account and file tests are required before release.
 
 Never commit .env values, provider/admin/database/mail credentials, session tokens, real-user uploads or private audit evidence. Configure deployment secrets server-side. .env.example contains variable names only. Git/container exclusions do not replace history scanning. Rotate any exposed credential and review provider activity. Do not post secrets or private source files in public issues.
 

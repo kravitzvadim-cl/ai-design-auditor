@@ -16,6 +16,7 @@
     "capture": "npm run build && node dist/src/capture-cli.js",
     "report": "npm run build && node dist/src/report-cli.js",
     "intake": "npm run build && node dist/tools/start-intake.js",
+    "beta:preview": "npm run build && node dist/tools/start-beta-preview.js",
     "check:supabase": "npm run build && node dist/tools/check-supabase.js"
   },
   "devDependencies": {
