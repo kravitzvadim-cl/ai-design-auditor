@@ -8,10 +8,12 @@ const status = (id: string, message: string, error = false) => { get(id).textCon
 async function api(path: string, data: unknown): Promise<Record<string, unknown>> {
   const result = await fetch(apiPath(path), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); const body = await result.json(); if (!result.ok) throw new Error(body.error ?? 'This action could not be completed.'); return body;
 }
-function changed() { disableTarget(); get<HTMLInputElement>('reviewed').checked = false; get('saved').hidden = true; updateSave(); }
-function updateSave() { get<HTMLButtonElement>('save').disabled = busy || !rules.length || !get<HTMLInputElement>('reviewed').checked || !get<HTMLInputElement>('system-name').value.trim(); get('rule-count').textContent = rules.length ? `${rules.length} text ${rules.length === 1 ? 'rule' : 'rules'}` : 'No rules yet'; }
+function changed() { disableTarget(); get('saved').hidden = true; updateSave(); }
+function updateSave() { get<HTMLButtonElement>('save').disabled = busy || !rules.length || !get<HTMLInputElement>('system-name').value.trim(); get('rule-count').textContent = rules.length ? `${rules.length} text ${rules.length === 1 ? 'rule' : 'rules'}` : 'No rules yet'; }
 function renderSources() {
   const list = get('sources'); list.replaceChildren();
+  get('rule-panel').hidden = sourceList.length === 0 && rules.length === 0;
+  get('add-source').textContent = sourceList.length ? 'Replace design system' : 'Load design system';
   for (const source of sourceList) {
     const card = element('div', '', 'source'); const head = element('div', '', 'source-head'); const name = element('div', source.name, 'source-name');
     const remove = element('button', 'Remove'); remove.type = 'button'; remove.setAttribute('aria-label', `Remove source ${source.name}`);
@@ -23,7 +25,7 @@ function renderSources() {
       if(item.state!=='done')throw new Error(String(item.message));const result=item.result as {rules:IntakeRule[];notes:string[];receipt:{chargedUSD:number|null;cached:boolean}};
       rules=rules.filter(r=>r.sourceId!==source.id);rules.push(...result.rules);source.rules=result.rules;source.message=[`${result.rules.length} AI suggestions. Review values, sources and conditions.`,...result.notes,usage(result.receipt)].join(' ');renderSources();renderRules();changed();
     });
-    const actions=element('div','','source-actions');actions.append(interpret,remove);head.append(name, actions); card.append(head, element('p', `${source.kind} · ${source.state === 'connection-required' ? 'Connection needed' : source.state === 'needs-review' ? 'Manual review needed' : 'Ready to review'}`), element('p', source.message));
+    const actions=element('div','','source-actions');if (aiAvailable) actions.append(interpret); actions.append(remove);head.append(name, actions); card.append(head, element('p', `${source.kind} · ${source.state === 'connection-required' ? 'Connection needed' : source.state === 'needs-review' ? 'Manual review needed' : 'Ready to review'}`), element('p', source.message));
     if (source.text) { const details = element('details'); details.append(element('summary', 'Read extracted source text'), element('pre', source.text.slice(0, 12000), 'excerpt')); card.append(details); }
     if (isPrivateWorkspace) {
       const original = element('a', 'Download original');
@@ -39,7 +41,7 @@ function field(label: string, value: string, onInput: (value: string) => void, i
 }
 function renderRules() {
   const list = get('rule-list'); list.replaceChildren();
-  if (!rules.length) list.append(element('p', 'Your imported rules will appear here. You can also add a rule yourself, even if a source needs access or a different export.', 'empty'));
+  if (!rules.length) list.append(element('p', 'No text sizes or colors were found. Add a documented text style or try a different export.', 'empty'));
   for (const rule of rules) {
     const row = element('div', '', 'rule'); const head = element('div', '', 'rule-head');
     const name = element('input'); name.value = rule.name; name.maxLength = 160; name.setAttribute('aria-label', 'Text style name'); name.oninput = () => { rule.name = name.value; changed(); };
@@ -58,32 +60,35 @@ function renderRules() {
 }
 async function add(data: unknown) {
   const result = await api('/api/import', data) as unknown as Omit<IntakeSource, 'original'>;
-  sourceList.push(result); rules.push(...result.rules); renderSources(); renderRules(); changed();
+  if (result.state === 'connection-required') {
+    throw new Error('This Figma link needs a connection. Upload a Figma JSON export to continue.');
+  }
+  sourceList.splice(0, sourceList.length, result);
+  rules = [...result.rules];
+  get<HTMLInputElement>('system-name').value = result.name.length <= 120 ? result.name : 'My design system'; renderSources(); renderRules(); changed();
   return result;
 }
 async function importing(action: () => Promise<void>) {
-  if (busy) return; busy = true; get<HTMLButtonElement>('add-source').disabled = true; get<HTMLButtonElement>('choose-files').disabled = true; updateSave(); status('import-status', isPrivateWorkspace ? 'Reading your source…' : 'Reading your source locally…');
-  try { await action(); status('import-status', 'Source added. Review the suggestions or enter any missing rules.'); } catch (error) { status('import-status', error instanceof Error ? error.message : 'Source could not be read.', true); }
+  if (busy) return; busy = true; get<HTMLButtonElement>('add-source').disabled = true; get<HTMLButtonElement>('choose-files').disabled = true; updateSave(); status('import-status', 'Reading your design system…');
+  try { await action(); status('import-status', 'Check the text styles below, then select Confirm and continue.'); } catch (error) { status('import-status', error instanceof Error ? error.message : 'Design system could not be read.', true); }
   finally { busy = false; get<HTMLButtonElement>('add-source').disabled = false; get<HTMLButtonElement>('choose-files').disabled = false; renderSources(); updateSave(); }
 }
 get<HTMLFormElement>('import-form').onsubmit = event => { event.preventDefault(); const value = get<HTMLTextAreaElement>('source-input').value.trim(); if (!value) return; void importing(async () => { await add({ type: /^https?:\/\/\S+$/i.test(value) ? 'link' : 'text', value }); get<HTMLTextAreaElement>('source-input').value = ''; }); };
 async function files(list: FileList | File[]) {
   await importing(async () => {
-    const failures: string[] = [];
-    for (const file of Array.from(list)) {
-      try {
-        if (file.size > 8_000_000 || !file.size) throw new Error('File must be nonempty and smaller than 8 MB.');
-        const buffer = new Uint8Array(await file.arrayBuffer()); let binary = ''; for (let i = 0; i < buffer.length; i += 8192) binary += String.fromCharCode(...buffer.subarray(i, i + 8192));
-        await add({ type: 'file', name: file.name, mediaType: file.type, data: btoa(binary) });
-      } catch (error) { failures.push(`${file.name}: ${error instanceof Error ? error.message : 'Could not read file'}`); }
-    }
-    if (failures.length) throw new Error(failures.join(' '));
+    if (list.length !== 1) throw new Error('Choose one design system file.');
+    const file = list[0]!;
+    if (file.size > 8_000_000 || !file.size) throw new Error('Choose a nonempty file up to 8 MB.');
+    const buffer = new Uint8Array(await file.arrayBuffer());
+    let binary = '';
+    for (let i = 0; i < buffer.length; i += 8192) binary += String.fromCharCode(...buffer.subarray(i, i + 8192));
+    await add({ type: 'file', name: file.name, mediaType: file.type, data: btoa(binary) });
   });
 }
 get('choose-files').onclick = () => get<HTMLInputElement>('files').click(); get<HTMLInputElement>('files').onchange = event => { const input = event.target as HTMLInputElement; if (input.files) void files(input.files); input.value = ''; };
 const drop = get('drop'); drop.ondragover = event => { event.preventDefault(); drop.classList.add('drag'); }; drop.ondragleave = () => drop.classList.remove('drag'); drop.ondrop = event => { event.preventDefault(); drop.classList.remove('drag'); if (event.dataTransfer?.files) void files(event.dataTransfer.files); };
 get('add-rule').onclick = () => { rules.push({ id: crypto.randomUUID(), name: '', size: '', color: '', theme: 'all', sourceId: 'manual', evidence: 'Owner-entered rule' }); renderRules(); changed(); get('rule-list').lastElementChild?.querySelector('input')?.focus(); };
-get('reviewed').onchange = updateSave; get('system-name').oninput = () => { get('saved').hidden = true; updateSave(); };
+get('system-name').oninput = () => { get('saved').hidden = true; updateSave(); };
 get('save').onclick = async () => {
   if (get<HTMLButtonElement>('save').disabled) return; busy = true; updateSave(); status('save-status', isPrivateWorkspace ? 'Saving to your project…' : 'Saving locally…');
   try {
@@ -153,7 +158,6 @@ async function refreshLibrary() {
             sourceList.splice(0, sourceList.length, ...saved.sources);
             rules = structuredClone(saved.rules);
             get<HTMLInputElement>('system-name').value = saved.name;
-            get<HTMLInputElement>('reviewed').checked = true;
             renderSources();
             renderRules();
             showSaved(saved);
@@ -182,4 +186,10 @@ if (isPrivateWorkspace) {
   document.addEventListener('library-updated', () => { void refreshLibrary(); });
 }
 renderRules();
-void fetch(apiPath('/api/status')).then(r => r.json()).then(info => { aiAvailable=!!info.ai;get('ai-connection').textContent=info.ai?'Gemini 2.5 Flash Lite connected through OpenRouter. Interpret with AI sends this source’s extracted text to the provider. Session budget: $0.25.':isPrivateWorkspace ? 'Review and map the rules manually in this preview.' : 'AI is not connected. Set OPENROUTER_API_KEY in .env and restart the app. Manual rules and capture still work.';renderSources();get('connections').textContent = info.figma ? 'Figma connection configured. Imports use your access permissions.' : 'Figma links can be added. Reading Figma content needs a local connection or an exported file.'; }).catch(() => { get('connections').textContent = 'Connection status is unavailable. Reload to try again.'; });
+void fetch(apiPath('/api/status')).then(r => r.json()).then(info => {
+  aiAvailable = !!info.ai;
+  renderSources();
+  get('connections').textContent = info.figma
+    ? 'Figma uses your connected account.'
+    : 'For Figma files that need a connection, upload a Figma JSON export.';
+}).catch(() => {});

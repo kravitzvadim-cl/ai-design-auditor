@@ -143,9 +143,6 @@ export function betaServer(origin: string, supabase: SupabaseWorkspace, services
       if (!match[2] && request.method === 'GET') {
         return html(200, intakeHTML
           .replace('<span>Local design-system audit</span>', () => `<div class="actions"><a href="/">Your projects</a>${signOutForm}</div>`)
-          .replace('Combine a Figma library, a documentation page, and files in the same system.', linkOnly
-            ? 'Use public documentation, pasted rules, text files, or a Figma JSON export. You can attach PDFs, images, and Word files and enter their rules manually.'
-            : 'Combine a Figma library, a documentation page, and files in the same system.')
           .replace('<main id="main">', () => `<main id="main"><section class="panel" style="margin-bottom:24px"><h2>${escape(project.name)}</h2><div id="private-library"></div></section>`)
           .replace('Sources and evidence stay in local files. AI interpretation sends extracted source text or page text to OpenRouter when you request it. This local workspace is not a hosted multi-user service.', 'Saved rules and audit evidence are private to your account.'));
       }

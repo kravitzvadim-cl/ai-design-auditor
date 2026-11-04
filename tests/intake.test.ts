@@ -64,19 +64,31 @@ test('local intake saves reviewed versions, rejects conflicts and preserves uplo
   } finally { await new Promise<void>(resolve => server.close(() => resolve())); await rm(root, { recursive: true, force: true }); }
 });
 
-test('intake browser combines sources, edits suggestions and saves through the UI', { timeout: 60000 }, async () => {
+test('intake browser replaces the active design system and preserves it after a failed import', { timeout: 60000 }, async () => {
   const configuredFigma = process.env.FIGMA_ACCESS_TOKEN; delete process.env.FIGMA_ACCESS_TOKEN;
   const root = await mkdtemp(join(tmpdir(), 'auditor-intake-ui-')); const server = intakeServer(root); await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
   const browser = await chromium.launch({ headless: true, executablePath: process.env.CHROMIUM ?? chromium.executablePath() });
   try {
     const page = await browser.newPage({ viewport: { width: 390, height: 844 } }); const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
     await page.goto(`http://127.0.0.1:${(server.address() as { port: number }).port}`);
-    await page.getByLabel('Paste a link or your guidelines').fill('Heading: 32px #183b36'); await page.getByRole('button', { name: 'Add source', exact: true }).click(); await page.waitForFunction(() => document.querySelectorAll('.rule').length === 1);
-    await page.locator('#files').setInputFiles({ name: 'styles.css', mimeType: 'text/css', buffer: Buffer.from('.body {font-size:16px;color:#444}') }); await page.waitForFunction(() => document.querySelectorAll('.rule').length === 2);
-    await page.getByLabel('Paste a link or your guidelines').fill('https://www.figma.com/design/abcde/Example'); await page.getByRole('button', { name: 'Add source', exact: true }).click(); await page.waitForFunction(() => document.querySelectorAll('.source').length === 3);
-    assert.match(await page.locator('#sources').innerText(), /Connection needed/);
-    await page.getByLabel('Design-system name').fill('UI verified'); await page.getByLabel('I reviewed these text sizes, colors and their usage.').check(); await page.getByRole('button', { name: 'Save design system', exact: true }).click(); await page.locator('#saved').waitFor({ state: 'visible' });
-    assert.match(await page.locator('#saved').innerText(), /2 reviewed text rules/);
-    const savedPath = await page.locator('#saved code').innerText(); const persisted = JSON.parse(await readFile(join(root, savedPath), 'utf8')); assert.equal(persisted.sources.length, 3, 'Keep attached sources even when Figma access is pending.'); assert.deepEqual(errors, []); assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+    assert.equal(await page.locator('#rule-panel').isHidden(), true);
+    await page.getByLabel('Design system link').fill('Heading: 32px #183b36');
+    await page.getByRole('button', { name: 'Load design system', exact: true }).click();
+    await page.waitForFunction(() => document.querySelectorAll('.rule').length === 1);
+    await page.locator('#files').setInputFiles({ name: 'styles.css', mimeType: 'text/css', buffer: Buffer.from('.body {font-size:16px;color:#444}') });
+    await page.getByText('styles.css', { exact: true }).waitFor();
+    assert.equal(await page.locator('.rule').count(), 1);
+    await page.getByLabel('Design system link').fill('https://www.figma.com/design/abcde/Example');
+    await page.getByRole('button', { name: 'Replace design system', exact: true }).click();
+    await page.getByText('This Figma link needs a connection. Upload a Figma JSON export to continue.').waitFor();
+    assert.equal(await page.locator('.source').count(), 1);
+    await page.getByRole('button', { name: 'Confirm and continue', exact: true }).click();
+    await page.locator('#target-panel').waitFor({ state: 'visible' });
+    const savedPath = await page.locator('#saved code').innerText();
+    const persisted = JSON.parse(await readFile(join(root, savedPath), 'utf8'));
+    assert.equal(persisted.sources.length, 1);
+    assert.equal(persisted.sources[0].name, 'styles.css');
+    assert.deepEqual(errors, []);
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
   } finally { if (configuredFigma !== undefined) process.env.FIGMA_ACCESS_TOKEN = configuredFigma; await browser.close(); await new Promise<void>(resolve => server.close(() => resolve())); await rm(root, { recursive: true, force: true }); }
 });
