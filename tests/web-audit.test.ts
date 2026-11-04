@@ -70,8 +70,25 @@ test('browser runs an automatic audit and marks issues without mapping checkboxe
     await p.getByLabel('Design system link').fill('Body text: 19px #0b0c0c');await p.getByRole('button',{name:'Load design system',exact:true}).click();await p.getByRole('button',{name:'Interpret Pasted guidelines with AI'}).waitFor();await p.getByRole('button',{name:'Interpret Pasted guidelines with AI'}).click();await p.waitForFunction(()=>document.querySelector('.source')?.textContent?.includes('AI suggestions'));
     await p.getByRole('button',{name:'Confirm and continue',exact:true}).click();await p.locator('#target-panel').waitFor({state:'visible'});
     await p.getByLabel('Page URL').fill('https://fixture.example/page');
+    let releaseComparison!: () => void;
+    const comparison = new Promise<void>(resolve => { releaseComparison = resolve; });
+    await p.route('**/api/audit', async route => { await comparison; await route.continue(); }, {times:1});
     await p.getByRole('button',{name:'Check this page',exact:true}).click();
+    const progress = p.getByRole('progressbar',{name:'Audit in progress'});
+    try {
+      await progress.waitFor({state:'visible'});
+      assert.equal(await progress.getAttribute('aria-valuenow'),null);
+      await p.getByText('Checking text against your design system…',{exact:true}).waitFor();
+      assert.equal(await progress.isVisible(),true);
+      if(process.env.AUDITOR_VISUAL_EVIDENCE){
+        const out=process.env.AUDITOR_VISUAL_EVIDENCE;
+        await mkdir(out,{recursive:true});
+        await p.locator('#target-panel').screenshot({path:join(out,'audit-progress-390.png')});
+      }
+    } finally { releaseComparison(); }
     await p.getByRole('heading',{name:'2 design errors',exact:true}).waitFor();
+    await progress.waitFor({state:'hidden'});
+    assert.equal(await p.getByRole('link',{name:'Findings',exact:true}).getAttribute('aria-current'),'step');
     await p.getByText('Adjust what was checked',{exact:true}).waitFor();
     assert.equal(await p.locator('#mapping-panel').getAttribute('open'),null);
     assert.equal(await p.getByRole('button',{name:'Show issue 1',exact:true}).isVisible(),true);
@@ -99,6 +116,11 @@ test('browser runs an automatic audit and marks issues without mapping checkboxe
 
     await p.getByLabel('Page URL').fill('https://fixture.example/changed');assert.equal(await p.locator('#mapping-panel').isHidden(),true);assert.equal(await p.locator('#web-results').isHidden(),true);assert.equal(await p.locator('#run-audit').isDisabled(),true);
     await p.getByLabel('Browser appearance').selectOption('light');assert.equal(await p.locator('#mapping-panel').isHidden(),true);
+    await p.route('**/api/inspect',route=>route.fulfill({status:400,json:{error:'This test page could not be captured.'}}),{times:1});
+    await p.getByRole('button',{name:'Check this page',exact:true}).click();
+    await p.getByText('This test page could not be captured.',{exact:true}).waitFor();
+    assert.equal(await progress.isVisible(),false);
+
     await p.getByLabel('Page URL').fill('https://fixture.example/failed');await p.getByRole('button',{name:'Check this page',exact:true}).click();await p.getByRole('heading',{name:'No selected text could be checked',exact:true}).waitFor();assert.equal(await p.getByRole('heading',{name:'No errors in the selected checks',exact:true}).count(),0);assert.equal(await p.locator('#web-results .coverage').getAttribute('open'),'');assert.match(await p.locator('#web-results').innerText(),/No conformance result is available/);
     if(process.env.AUDITOR_VISUAL_EVIDENCE){for(const width of [1440,819,390]){await p.setViewportSize({width,height:900});await p.locator('#web-results').screenshot({path:join(process.env.AUDITOR_VISUAL_EVIDENCE,`unchecked-${width}.png`)});}}
     await p.getByLabel('Text style name').first().fill('Changed unsaved');assert.equal(await p.locator('#target-panel').isHidden(),true);assert.equal(await p.locator('#web-results').isHidden(),true);

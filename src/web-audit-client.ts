@@ -7,14 +7,43 @@ export const isPrivateWorkspace = Boolean(projectPath);
 const get=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
 const el=<K extends keyof HTMLElementTagNameMap>(tag:K,text='',className='')=>{const n=document.createElement(tag);n.textContent=text;n.className=className;return n;};
 let systemId='',rules:IntakeRule[]=[],targetId='',candidates:Candidate[]=[],mappings:Mapping[]=[],busy=false,generation=0;
-const message=(text:string,error=false)=>{get('target-status').textContent=text;get('target-status').classList.toggle('error',error);};
+const message=(text:string,error=false)=>{
+  const status=get('target-status');
+  if(status.textContent!==text)status.textContent=text;
+  status.classList.toggle('error',error);
+};
+function updateNavigation(current:'system'|'target'|'report'){
+  const links=[['system','source-title'],['target','target-panel'],['report','web-results']] as const;
+  for(const [step,target] of links){
+    const link=get('audit-nav-'+step);
+    if(step==='system'||!get(target).hidden){
+      link.setAttribute('href','#'+target);link.removeAttribute('aria-disabled');
+    }else{
+      link.removeAttribute('href');link.setAttribute('aria-disabled','true');
+    }
+    if(step===current)link.setAttribute('aria-current','step');
+    else link.removeAttribute('aria-current');
+  }
+}
+for(const step of ['system','target','report'] as const)get('audit-nav-'+step).onclick=()=>{
+  if(get('audit-nav-'+step).hasAttribute('href'))updateNavigation(step);
+};
 async function post(path:string,data:unknown){const r=await fetch(apiPath(path),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});const value=await r.json();if(!r.ok)throw new Error(value.error??'The task failed.');return value;}
 async function job(path:string,data:unknown){let item=await post(path,data);while(item.state==='running'){message(item.message);await new Promise(resolve=>setTimeout(resolve,800));const r=await fetch(apiPath(`/api/jobs/${item.id}`));item=await r.json();if(!r.ok)throw new Error('Task status is unavailable. Try the task again.');}if(item.state!=='done')throw new Error(item.message);return item.result;}
 function controls(){get<HTMLButtonElement>('inspect-target').disabled=busy;get<HTMLButtonElement>('suggest-mappings').disabled=busy||!targetId;get<HTMLButtonElement>('run-audit').disabled=busy||!targetId||!mappings.some(m=>m.elementIds.length>0);}
-async function working(action:()=>Promise<void>){if(busy)return;busy=true;controls();try{await action();}catch(error){message(error instanceof Error?error.message:'This task failed.',true);}finally{busy=false;controls();}}
-export function disableTarget(){generation++;get('target-panel').hidden=true;get('web-results').hidden=true;}
-export function enableTarget(id:string,reviewedRules:IntakeRule[]){generation++;systemId=id;rules=reviewedRules;targetId='';mappings=[];candidates=[];get('target-panel').hidden=false;get('mapping-panel').hidden=true;get('web-results').hidden=true;message('Add the public page you want to check against these saved rules.');controls();}
-function targetChanged(){generation++;targetId='';mappings=[];candidates=[];get('mapping-panel').hidden=true;get('web-results').hidden=true;message('Ready to check the page with these settings.');controls();}
+async function working(action:()=>Promise<void>, initialStage?:string){
+  if(busy)return;
+  busy=true;
+  const progress=get('audit-progress');
+  if(initialStage){progress.hidden=false;message(initialStage);}
+  controls();
+  try{await action();}
+  catch(error){message(error instanceof Error?error.message:'This task failed.',true);}
+  finally{progress.hidden=true;busy=false;controls();}
+}
+export function disableTarget(){generation++;get('target-panel').hidden=true;get('web-results').hidden=true;updateNavigation('system');}
+export function enableTarget(id:string,reviewedRules:IntakeRule[]){generation++;systemId=id;rules=reviewedRules;targetId='';mappings=[];candidates=[];get('target-panel').hidden=false;get('mapping-panel').hidden=true;get('web-results').hidden=true;message('Add the public page you want to check against these saved rules.');updateNavigation('target');controls();}
+function targetChanged(){generation++;targetId='';mappings=[];candidates=[];get('mapping-panel').hidden=true;get('web-results').hidden=true;message('Ready to check the page with these settings.');updateNavigation('target');controls();}
 get('target-url').oninput=targetChanged;get('target-theme').onchange=targetChanged;
 function mappingChanged(){controls();}
 function renderMappings(){
@@ -29,7 +58,7 @@ function renderMappings(){
   const panel=get<HTMLDetailsElement>('mapping-panel');panel.open=false;panel.hidden=false;mappingChanged();
 }
 get<HTMLFormElement>('target-form').onsubmit=event=>{event.preventDefault();void working(async()=>{
-  get('web-results').hidden=true;get('mapping-panel').hidden=true;
+  get('web-results').hidden=true;get('mapping-panel').hidden=true;updateNavigation('target');
   const selected=get<HTMLSelectElement>('target-theme').value;const themes=selected==='both'?['light','dark']:[selected];
   const version=generation;
   const result=await job('/api/inspect',{systemId,url:get<HTMLInputElement>('target-url').value.trim(),themes});
@@ -37,7 +66,7 @@ get<HTMLFormElement>('target-form').onsubmit=event=>{event.preventDefault();void
   targetId=result.id;candidates=result.candidates;mappings=result.mappings;
   renderMappings();
   await showAudit(version, true);
-});};
+},'Starting the audit…');};
 get('suggest-mappings').onclick=()=>void working(async()=>{
   const version=generation;const result=await job('/api/map',{systemId,targetId});
   if(version!==generation)return;
@@ -48,13 +77,14 @@ if (!isPrivateWorkspace) void fetch(apiPath('/api/status')).then(r=>r.json()).th
   get('suggest-mappings').hidden=!info.ai;
 }).catch(()=>{});
 async function showAudit(version:number,automatic:boolean){
+  message('Checking text against your design system…');
   const report:WebReport=await post('/api/audit',{systemId,targetId,automatic,mappings,reviewed:!automatic});
   if(version!==generation)return;
   renderReport(report);
   message(report.checked ? 'Audit complete.' : 'No text could be checked. See the coverage details in the report.');
   if(isPrivateWorkspace)document.dispatchEvent(new Event('library-updated'));
 }
-get('run-audit').onclick=()=>void working(()=>showAudit(generation,false));
+get('run-audit').onclick=()=>void working(()=>showAudit(generation,false),'Checking selected text…');
 export function usage(receipt:{chargedUSD:number|null;cached?:boolean}){return receipt.cached?'Reused cached interpretation.':receipt.chargedUSD!==null?`AI request: $${receipt.chargedUSD.toFixed(5)}.`:'AI usage recorded; provider cost unavailable.';}
 export function reopenReport(report: WebReport, reviewedRules: IntakeRule[]) {
   generation++;
@@ -185,5 +215,5 @@ function renderReport(report:WebReport, reviewedRules = rules){
     };
     report.differences.forEach((d,i)=>{const button=el('button',`${i+1}. ${d.name}: ${d.property==='font-size'?'text size':'text color'}`);button.type='button';button.onclick=()=>{selected=i;location=0;show();};list.append(button);});workspace.append(list,evidence,detail);root.append(workspace);show();
   }
-  const download=el('button','Download audit evidence');download.type='button';download.onclick=()=>{const blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=el('a');a.href=url;a.download='audit-report.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};root.append(download);root.hidden=false;root.scrollIntoView({behavior:'instant',block:'start'});
+  const download=el('button','Download audit evidence');download.type='button';download.onclick=()=>{const blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=el('a');a.href=url;a.download='audit-report.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};root.append(download);root.hidden=false;updateNavigation('report');root.scrollIntoView({behavior:'instant',block:'start'});
 }
