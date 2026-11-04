@@ -102,6 +102,12 @@ function renderReport(report:WebReport, reviewedRules = rules){
     const workspace=el('div','','error-workspace');
     const list=el('div','','error-index');list.setAttribute('aria-label','Design errors');
     const detail=el('section','','error-detail');
+    const sidebar=el('aside','','review-sidebar');
+    sidebar.setAttribute('aria-label','Finding inspector');
+    const sidebarTitle=el('p','Findings','review-list-title');
+    sidebarTitle.append(el('span',String(report.differences.length)));
+    sidebar.append(sidebarTitle,list,detail);
+
     const evidence=el('section','','evidence-desk');
     const toolbar=el('div','','evidence-toolbar');
     const caption=el('span','','capture-caption');
@@ -213,7 +219,7 @@ function renderReport(report:WebReport, reviewedRules = rules){
       if(affected.selector)provenance.append(el('p',affected.selector));
       provenance.append(el('p',report.limitations.join(' ')));detail.append(provenance);
     };
-    report.differences.forEach((d,i)=>{const button=el('button',`${i+1}. ${d.name}: ${d.property==='font-size'?'text size':'text color'}`);button.type='button';button.onclick=()=>{selected=i;location=0;show();};list.append(button);});workspace.append(list,evidence,detail);root.append(workspace);show();
+    report.differences.forEach((d,i)=>{const button=el('button',`${i+1}. ${d.name}: ${d.property==='font-size'?'text size':'text color'}`);button.type='button';button.onclick=()=>{selected=i;location=0;show();};list.append(button);});workspace.append(evidence,sidebar);root.append(workspace);show();
   }
   const download=el('button','Download audit evidence');download.type='button';download.onclick=()=>{const blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=el('a');a.href=url;a.download='audit-report.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};root.append(download);root.hidden=false;updateNavigation('report');root.scrollIntoView({behavior:'instant',block:'start'});
 }
