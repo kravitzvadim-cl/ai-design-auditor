@@ -11,7 +11,7 @@ import type { Candidate, Mapping } from './openrouter.js';
 export type Measured = Candidate & { size: string; color: string; bounds: { x: number; y: number; width: number; height: number }; rootSize: string; parentSize: string; references?: Record<string,string> };
 export type WebCapture = { id: string; width: number; theme: 'light'|'dark'; screenshot: string; elements: Measured[]; issues: string[]; truncated: boolean };
 export type WebTarget = { id: string; url: string; folder: string; candidates: Candidate[]; captures: WebCapture[]; resources: { url: string; sha256: string }[]; capturedAt: string; browser: string };
-export type WebDifference = { ruleId: string; name: string; property: 'font-size'|'color'; expected: string; actual: string; locations: { captureId: string; elementId: string; text: string; bounds: Measured['bounds'] }[] };
+export type WebDifference = { ruleId: string; name: string; property: 'font-size'|'color'; expected: string; actual: string; locations: { captureId: string; elementId: string; text: string; selector?: string; bounds: Measured['bounds'] }[] };
 export type WebReport = { id: string; targetId: string; url: string; createdAt: string; differences: WebDifference[]; unchecked: string[]; unmappedRules: string[]; captures: WebCapture[]; checked: number; limitations: string[] };
 export type PublicReader = typeof fetchPublic;
 export async function inspectWebsite(raw: string, directory: string, themes: ('light'|'dark')[] = ['light'], reader: PublicReader = fetchPublic, expectedSizes: string[] = []): Promise<WebTarget> {
@@ -55,7 +55,7 @@ export async function inspectWebsite(raw: string, directory: string, themes: ('l
           const path=(e:Element)=>{const parts:string[]=[];let at:Element|null=e;while(at&&at.tagName!=='HTML'){const tag=at.tagName.toLowerCase(),parent:Element|null=at.parentElement;parts.unshift(tag+':nth-of-type('+([...(parent?.children??[])].filter(child=>child.tagName===at!.tagName).indexOf(at)+1)+')');at=parent;}return 'html > '+parts.join(' > ');};
           return {truncated:items.length>250,tooTall:document.documentElement.scrollHeight>10000,frames:document.querySelectorAll('iframe,frame').length,shadows:[...document.querySelectorAll('*')].some(e=>e.shadowRoot),items:items.slice(0,250).map(e=>{const s=getComputedStyle(e),r=e.getBoundingClientRect();const references:Record<string,string>={};
             for(const size of expectedSizes)if(CSS.supports('font-size',size)){const parent=document.createElement('div'),reference=document.createElement('span');parent.style.setProperty('position','fixed','important');parent.style.setProperty('visibility','hidden','important');parent.style.setProperty('font-size',getComputedStyle(e.parentElement??document.documentElement).fontSize,'important');reference.style.setProperty('font-size',size,'important');parent.append(reference);document.body.append(parent);references[size]=getComputedStyle(reference).fontSize;parent.remove();}
-            return {references,selector:path(e),tag:e.tagName.toLowerCase(),text:e.textContent!.trim().slice(0,200),classes:String(e.className).slice(0,200),role:e.getAttribute('role')??'',size:s.fontSize,color:s.color,rootSize:getComputedStyle(document.documentElement).fontSize,parentSize:getComputedStyle(e.parentElement??document.documentElement).fontSize,bounds:{x:r.x+scrollX,y:r.y+scrollY,width:r.width,height:r.height}};})};
+            return {references,selector:path(e),tag:e.tagName.toLowerCase(),text:e.textContent!.trim().slice(0,200),classes:String(e.className).slice(0,200),role:e.getAttribute('role')??'',inContent:!!e.closest('main,article,[role=main]')&&!e.closest('nav,header,footer,aside,form,[role=navigation],[role=alert]'),size:s.fontSize,color:s.color,rootSize:getComputedStyle(document.documentElement).fontSize,parentSize:getComputedStyle(e.parentElement??document.documentElement).fontSize,bounds:{x:r.x+scrollX,y:r.y+scrollY,width:r.width,height:r.height}};})};
         }, [...new Set(expectedSizes)].filter(validSize));
         if(observed.tooTall)throw new Error('This page exceeds the 10,000px capture limit. Use a smaller page.');
         capture.truncated=observed.truncated;
@@ -67,7 +67,7 @@ export async function inspectWebsite(raw: string, directory: string, themes: ('l
       finally{await context.close();}
       result.captures.push(capture);
     }
-    const map=new Map<string,Candidate>();for(const c of result.captures)for(const e of c.elements)map.set(e.id,{id:e.id,selector:e.selector,tag:e.tag,text:e.text,classes:e.classes,role:e.role});
+    const map=new Map<string,Candidate>();for(const c of result.captures)for(const e of c.elements)map.set(e.id,{id:e.id,selector:e.selector,tag:e.tag,text:e.text,classes:e.classes,role:e.role,inContent:e.inContent??false});
     result.candidates=[...map.values()].slice(0,250);
     await writeFile(join(output,'target.json'),JSON.stringify(result,null,2)+'\n',{flag:'wx',mode:0o600});return result;
   } finally{await browser.close();}
@@ -79,6 +79,35 @@ function expectedSize(size:string,element:Measured):string|null {
   if(size.endsWith('pt'))return `${n*96/72}px`;
   return size.endsWith('px')?size:null;
 }
+// Match documented roles to page semantics. Measured sizes and colors never select a rule.
+export function matchPageText(rules: IntakeRule[], candidates: Candidate[]): Mapping[] {
+  const proposed = rules.map(rule => {
+    const name = rule.name.trim().toLowerCase();
+    const explicitClass = /^\.([a-z][\w-]*)$/.exec(name)?.[1];
+    const heading = /^(?:heading\s*h?|h)([1-6])$/.exec(name.replace(/\s+/g, ''))?.[1];
+    const lead = /^(?:lead|introductory) paragraph\b|^a lead paragraph\b/.test(name);
+    const body = /^(?:body(?: text| copy)?|paragraphs?)$|^the majority of your body copy\b/.test(name);
+    const link = /^(?:default |body |text )?links?$/.test(name);
+    const ids = candidates.filter(candidate => {
+      const classes = candidate.classes.toLowerCase().split(/\s+/);
+      if (explicitClass) return classes.includes(explicitClass);
+      if (heading) return candidate.inContent && candidate.tag === 'h' + heading;
+      if (lead) return candidate.inContent && candidate.tag === 'p' && classes.some(value => ['lead','govuk-body-l','nhsuk-body-l','nhsuk-lede'].includes(value));
+      if (body) return candidate.inContent && candidate.tag === 'p' && (candidate.classes.trim() === '' || classes.some(value => ['govuk-body','nhsuk-body'].includes(value)));
+      if (link) return candidate.inContent && candidate.tag === 'a' && classes.some(value => ['govuk-link','nhsuk-link'].includes(value)) && !classes.some(value => /--/.test(value));
+      return false;
+    }).map(candidate => candidate.id);
+    return { rule, ids };
+  });
+  return proposed.map(({ rule, ids }) => ({
+    ruleId: rule.id,
+    elementIds: ids.filter(id => !proposed.some(other => other.rule !== rule && other.ids.includes(id)
+      && (rule.theme === 'all' || other.rule.theme === 'all' || rule.theme === other.rule.theme)
+      && Math.max(rule.aboveWidth ?? -1, other.rule.aboveWidth ?? -1) < Math.min(rule.maxWidth ?? Infinity, other.rule.maxWidth ?? Infinity)
+      && ((rule.size && other.rule.size && rule.size !== other.rule.size) || (rule.color && other.rule.color && rule.color !== other.rule.color)))),
+  }));
+}
+
 export function compareWebsite(target:WebTarget,rules:IntakeRule[],mappings:Mapping[]):WebReport {
   const known=new Set(target.candidates.map(c=>c.id));const seen=new Set<string>();
   for(const mapping of mappings)if(!rules.some(r=>r.id===mapping.ruleId)||seen.has(mapping.ruleId)||!Array.isArray(mapping.elementIds)||mapping.elementIds.length>250||mapping.elementIds.some(id=>!known.has(id)))throw new Error('Choose only rules and elements from this capture.');else seen.add(mapping.ruleId);
@@ -94,7 +123,7 @@ export function compareWebsite(target:WebTarget,rules:IntakeRule[],mappings:Mapp
           if(!expected){unchecked.add(`${rule.name}: ${raw} cannot be resolved in this website context.`);continue;}
           const a=property==='font-size'?normalizePixels(expected):normalizeColor(expected),b=property==='font-size'?normalizePixels(actual):normalizeColor(actual);
           if(!a||!b){unchecked.add(`${rule.name}: value could not be compared.`);continue;}checked++;
-          if(!sameValue(a,b)){const key=JSON.stringify([rule.id,property,expected,actual]);const group=differences.get(key)??{ruleId:rule.id,name:rule.name,property,expected,actual,locations:[]};group.locations.push({captureId:capture.id,elementId:e.id,text:e.text,bounds:e.bounds});differences.set(key,group);}
+          if(!sameValue(a,b)){const key=JSON.stringify([rule.id,property,expected,actual]);const group=differences.get(key)??{ruleId:rule.id,name:rule.name,property,expected,actual,locations:[]};group.locations.push({captureId:capture.id,elementId:e.id,text:e.text,selector:e.selector,bounds:e.bounds});differences.set(key,group);}
         }
       }
     }

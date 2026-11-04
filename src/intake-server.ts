@@ -11,7 +11,7 @@ import { createCaptureDirectory } from './io.js';
 import { intakeHTML } from './intake-view.js';
 import { CheapInterpreter, CHEAP_MODEL } from './openrouter.js';
 import type { Mapping } from './openrouter.js';
-import { inspectWebsite, compareWebsite, saveWebReport, screenshotBytes } from './web-audit.js';
+import { inspectWebsite, compareWebsite, matchPageText, saveWebReport, screenshotBytes } from './web-audit.js';
 import type { WebTarget } from './web-audit.js';
 import type { Job, ProjectStore, SavedSystem } from './project-store.js';
 import { SupabaseUnavailable } from './supabase-workspace.js';
@@ -199,7 +199,7 @@ export function intakeHandler(directory = process.cwd(), services: IntakeService
                 throw error;
               }
             } else targets.set(target.id, target);
-            return { id: target.id, url: target.url, candidates: target.candidates, captures: target.captures.map(c => ({ id: c.id, width: c.width, theme: c.theme, issues: c.issues, truncated: c.truncated })) };
+            return { id: target.id, url: target.url, candidates: target.candidates, mappings: matchPageText(system.rules, target.candidates), captures: target.captures.map(c => ({ id: c.id, width: c.width, theme: c.theme, issues: c.issues, truncated: c.truncated })) };
           } finally {
             if (store) await rm(captureRoot, { recursive: true, force: true }).catch(() => {});
           }
@@ -213,9 +213,17 @@ export function intakeHandler(directory = process.cwd(), services: IntakeService
         send(202,await startJob(()=>ai.map(system.rules,target.candidates),'Suggesting which rules apply to the captured text…'));return;
       }
       if(path==='/api/audit') {
-        const [system, target] = await Promise.all([getSystem(String(input.systemId)), getTarget(String(input.targetId))]);if(!system||!target||!Array.isArray(input.mappings)||input.mappings.length>200||input.reviewed!==true)throw new Error('Review your rule-to-element mappings before auditing.');
-        const mappings=input.mappings as Mapping[];
-        const report=compareWebsite(target,system.rules,mappings);if(!report.checked&&!report.unchecked.length)throw new Error('No selected mappings apply in these captures. Choose the relevant elements, themes and widths.');
+        const [system, target] = await Promise.all([getSystem(String(input.systemId)), getTarget(String(input.targetId))]);
+        if (!system || !target) throw new Error('Load a design system and capture a page first.');
+        const automatic = input.automatic === true;
+        if (!automatic && (!Array.isArray(input.mappings) || input.mappings.length > 200 || input.reviewed !== true)) throw new Error('Review the selected page text before checking it.');
+        const mappings = automatic ? matchPageText(system.rules, target.candidates) : input.mappings as Mapping[];
+        const report = compareWebsite(target, system.rules, mappings);
+        if (!report.checked && !report.unchecked.length && !automatic) throw new Error('No selected text applies in these captures. Check the selected text, themes and widths.');
+        if (automatic) {
+          report.limitations[0] = 'Only text with a clear match to a confirmed design system rule was checked.';
+          if (!mappings.some(mapping => mapping.elementIds.length)) report.unchecked.push('No text could be confidently matched to the saved design system rules.');
+        }
         if (store) {
           if (await store.count('report') >= 30) throw new Error('This workspace has reached its 30-report limit.');
           await store.put('report', { id: report.id, url: report.url, report, rules: system.rules, mappings });

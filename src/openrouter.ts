@@ -7,7 +7,7 @@ const PRICE = { prompt: 0.15, completion: 0.60 };
 const MAX_OUTPUT = 3000;
 const clean = (text: string) => text.replace(/\s+/g, ' ').trim();
 export type ModelReceipt = { model: string; promptTokens: number; completionTokens: number; chargedUSD: number | null; reservedUSD: number; cached: boolean };
-export type Candidate = { id: string; selector: string; tag: string; text: string; classes: string; role: string };
+export type Candidate = { id: string; selector: string; tag: string; text: string; classes: string; role: string; inContent?: boolean };
 export type Mapping = { ruleId: string; elementIds: string[] };
 export type ModelOptions = { key?: string; fetcher?: typeof fetch; budgetUSD?: number };
 export class CheapInterpreter {
