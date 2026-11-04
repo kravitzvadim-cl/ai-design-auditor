@@ -18,6 +18,8 @@ Set the Supabase URL and publishable key from .env.example in ignored .env. Appl
 
 For a test using Supabase's default invitation email, set the Auth Site URL to http://127.0.0.1:4342/activate. Invite an address on the Supabase project team through the dashboard. Open the link on the machine running the preview, choose a password and then sign in. Accounts for external testers need configured SMTP. The preview uses manual interpretation and mapping until persistent AI quotas are in place.
 
+The optional public beta request page is separate from the audit app. Apply the beta access requests migration, then run `node tools/build-access-request.mjs` with `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` set. Host `dist/access-request` as a static site. Requests go to the private `beta_access_requests` table as pending; the form neither sends email nor creates accounts.
+
 Tests exercise sign-in, active membership, cross-account route denial and reopening saved work after a restart against a simulated Supabase service. A real invited-account test, representative Render workloads and portable document readers remain release checks.
 
 ## Status and limits
