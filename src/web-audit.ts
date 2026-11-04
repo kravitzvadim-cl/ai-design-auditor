@@ -18,7 +18,8 @@ export async function inspectWebsite(raw: string, directory: string, themes: ('l
   const url=checkedUrl(raw); url.hash=''; const id=randomUUID(); const folder=`reports/web-audits/${id}`; const output=await createCaptureDirectory(folder,directory);
   // Public pages execute untrusted scripts. Never disable Chromium's sandbox for
   // this path, even when a container runtime cannot provide the required support.
-  const browser=await chromium.launch({headless:true,chromiumSandbox:true,executablePath:process.env.CHROMIUM ?? chromium.executablePath()});
+  const browser=await chromium.launch({headless:true,chromiumSandbox:true,executablePath:process.env.CHROMIUM ?? chromium.executablePath(),
+    args:['--proxy-server=http://127.0.0.1:1','--proxy-bypass-list=<-loopback>','--disable-quic','--force-webrtc-ip-handling-policy=disable_non_proxied_udp']});
   const result: WebTarget={id,url:url.href,folder,candidates:[],captures:[],resources:[],capturedAt:new Date().toISOString(),browser:browser.version()};
   const cache=new Map<string,Promise<Awaited<ReturnType<PublicReader>>>>(); let totalBytes=0; let requests=0;
   try {

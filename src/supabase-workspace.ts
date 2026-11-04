@@ -6,7 +6,7 @@ export const accessToken = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
 export type Project = { id: string; name: string };
 export type Member = { id: string; token: string };
 export type SupabaseConfig = { url: string; publishableKey: string; fetcher?: typeof fetch };
-type AuthSession = { access_token?: string; expires_in?: number };
+type AuthSession = { access_token?: string; expires_in?: number; refresh_token?: string };
 export class SupabaseUnavailable extends Error {
   constructor() { super('Private workspace storage is temporarily unavailable.'); }
 }
@@ -68,6 +68,36 @@ export class SupabaseWorkspace {
     if (typeof session.access_token !== 'string' || !await this.member(session.access_token)) return;
     if (!Number.isFinite(session.expires_in) || session.expires_in! < 1) return;
     return { token: session.access_token, maxAge: Math.min(3600, Math.floor(session.expires_in!)) };
+  }
+
+  async redeemLink(tokenHash: string, type: 'invite' | 'magiclink') {
+    const response = await this.request('/auth/v1/verify', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token_hash: tokenHash, type }),
+    });
+    return this.linkSession(response);
+  }
+
+  async refreshLink(refreshToken: string) {
+    const response = await this.request('/auth/v1/token?grant_type=refresh_token', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    });
+    return this.linkSession(response);
+  }
+
+  private async linkSession(response: Response) {
+    if (!response.ok) {
+      await response.body?.cancel().catch(() => {});
+      if (response.status >= 500 || response.status === 429) throw new SupabaseUnavailable();
+      return;
+    }
+    const session = await response.json() as AuthSession;
+    if (typeof session.access_token !== 'string' || typeof session.refresh_token !== 'string' ||
+        !/^[A-Za-z0-9_-]{8,256}$/.test(session.refresh_token)) return;
+    const member = await this.member(session.access_token);
+    if (member) return { member, refreshToken: session.refresh_token };
+    await this.signOut(session.access_token).catch(() => {});
   }
 
   async finishPassword(tokenHash: string, type: 'invite' | 'recovery', password: string) {

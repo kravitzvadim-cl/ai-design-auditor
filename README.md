@@ -16,11 +16,13 @@ Run npm test for deterministic fixtures and Chromium integration checks. Tests u
 
 Set the Supabase URL and publishable key from .env.example in ignored .env. Apply the migration under supabase/migrations/ and turn off public signup. Run `npm run beta:preview` and open http://127.0.0.1:4342/. Sign in with an invited account to create projects, save rules, download originals and reopen reports with screenshots. The preview runs the live access checks before starting.
 
-For a test using Supabase's default invitation email, set the Auth Site URL to http://127.0.0.1:4342/activate. Invite an address on the Supabase project team through the dashboard. Open the link on the machine running the preview, choose a password and then sign in. Accounts for external testers need configured SMTP. The preview uses manual interpretation and mapping until persistent AI quotas are in place.
+The hosted beta runs the same workspace in link-only mode. Its Docker command is `node dist/tools/start-beta-preview.js --hosted`. Render provides the HTTPS origin and port. The service uses the Supabase URL and publishable key. The hosted beta uses manual rule mapping and supports text sources and Figma JSON exports. For PDFs, images and Word files, enter the rules manually or upload a text export.
+
+To invite a tester, first mark their request `approved` in Supabase. On the owner's computer, add `SUPABASE_ADMIN_KEY` to ignored `.env` and run `node tools/create-beta-link.mjs tester@example.com`. Share the resulting one-time link privately. The hosted service and public form never receive the admin key. Ask the owner for a fresh link after signing out or when the session expires.
 
 The optional public beta request page is separate from the audit app. Apply the beta access requests migration, then run `node tools/build-access-request.mjs` with `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` set. Host `dist/access-request` as a static site. Requests go to the private `beta_access_requests` table as pending; the form neither sends email nor creates accounts.
 
-Tests exercise sign-in, active membership, cross-account route denial and reopening saved work after a restart against a simulated Supabase service. A real invited-account test, representative Render workloads and portable document readers remain release checks.
+Tests exercise password and link sign-in, active membership, cross-account route denial and reopening saved work after a restart against a simulated Supabase service. A real invited-account test, representative Render workloads and portable document readers remain release checks.
 
 ## Status and limits
 

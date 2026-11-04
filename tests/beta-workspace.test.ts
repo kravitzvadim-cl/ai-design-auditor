@@ -14,7 +14,7 @@ const alice = { id: '10000000-0000-4000-8000-000000000001', token: 'fixture.alic
 const bob = { id: '10000000-0000-4000-8000-000000000002', token: 'fixture.bob.session' };
 const element = { id: 'body', tag: 'p', selector: 'p', text: 'Example', classes: '', role: '' };
 
-function fixture() {
+function fixture(linkSessions = false) {
   const members = new Set([alice.id, bob.id]);
   const projects: Record<string, string>[] = [];
   const records: { id: string; project_id: string; owner_id: string; kind: string; payload: Record<string, unknown> }[] = [];
@@ -34,13 +34,16 @@ function fixture() {
     assert.equal(init?.redirect, 'error');
 
     if (url.pathname === '/auth/v1/token') {
+      if (linkSessions && url.searchParams.get('grant_type') === 'refresh_token') {
+        return data.refresh_token === 'fixture_refresh' ? answer({ access_token: alice.token, refresh_token: 'fixture_rotated' }) : answer({}, 401);
+      }
       const account = data.email === 'alice@example.test' ? alice : data.email === 'bob@example.test' ? bob : undefined;
       return account && data.password === 'fixture password' ? answer({ access_token: account.token, refresh_token: 'never-forward-this', expires_in: 3600 }) : answer({}, 400);
     }
     if (url.pathname === '/auth/v1/verify') {
       if (data.token_hash !== 'fixture_invitation_link' || data.type !== 'invite' || verificationUsed) return answer({}, 403);
       verificationUsed = true;
-      return answer({ access_token: alice.token, expires_in: 3600 });
+      return answer({ access_token: alice.token, refresh_token: 'fixture_refresh', expires_in: 3600 });
     }
     if (url.pathname === '/auth/v1/user') {
       if (!user) return answer({}, 401);
@@ -121,8 +124,8 @@ function fixture() {
   };
 }
 
-async function openServer(backend: ReturnType<typeof fixture>) {
-  const server = betaServer(origin, backend.supabase, backend.services);
+async function openServer(backend: ReturnType<typeof fixture>, linkOnly = false) {
+  const server = betaServer(origin, backend.supabase, backend.services, linkOnly);
   await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
   const port = (server.address() as AddressInfo).port;
   const send = (path: string, options: { cookie?: string; json?: unknown; form?: Record<string, string>; requestOrigin?: string } = {}) => {
@@ -142,6 +145,36 @@ async function openServer(backend: ReturnType<typeof fixture>) {
   };
   return { send, close: () => new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve())) };
 }
+
+test('hosted links create an invited session, cannot be reused and honor revocation after refresh', async () => {
+  const backend = fixture(true);
+  const app = await openServer(backend, true);
+  try {
+    assert.equal((await app.send('/health')).body, 'ok');
+    assert.doesNotMatch((await app.send('/sign-in')).body, /type="password"/);
+    assert.equal((await app.send('/sign-in', { form: { email: 'alice@example.test', password: 'fixture password' } })).status, 405);
+    assert.equal((await app.send('/projects/10000000-0000-4000-8000-000000000001/api/library')).status, 401);
+    const form = { token: 'fixture_invitation_link', type: 'invite' };
+    assert.equal((await app.send('/activate', { form, requestOrigin: 'https://another.example' })).status, 403);
+    const signedIn = await app.send('/activate', { form });
+    assert.equal(signedIn.status, 303);
+    assert.equal(signedIn.headers.location, '/');
+    const cookies = signedIn.headers['set-cookie']!;
+    assert.equal(cookies.length, 2);
+    for (const value of cookies) assert.match(value, /HttpOnly; SameSite=Strict; Max-Age=604800; Secure/);
+    const session = cookies.map(value => value.split(';')[0]).join('; ');
+    assert.match((await app.send('/', { cookie: session })).body, /Your projects/);
+    assert.equal((await app.send('/activate', { form })).status, 400);
+    const expiredAccess = '__Host-auditor-session=expired.fixture.token; __Host-auditor-refresh=fixture_refresh';
+    const refreshed = await app.send('/', { cookie: expiredAccess });
+    assert.equal(refreshed.status, 200);
+    assert.match(refreshed.headers['set-cookie']![1]!, /^__Host-auditor-refresh=fixture_rotated;/);
+    backend.members.delete(alice.id);
+    const revoked = await app.send('/', { cookie: expiredAccess });
+    assert.equal(revoked.headers.location, '/sign-in');
+    assert.match(revoked.headers['set-cookie']![1]!, /Max-Age=0/);
+  } finally { await app.close(); }
+});
 
 test('invited sign-in, project and screenshot isolation, saved work after restart, and revocation', async () => {
   const backend = fixture();
