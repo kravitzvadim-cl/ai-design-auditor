@@ -41,6 +41,22 @@ test('HTML colour tables preserve row context and only import text roles', () =>
   assert.match(rules[0]!.evidence, /text \| #123456/);
 });
 
+test('responsive type tables use the documented font-size column and width condition', () => {
+  const header = '<tr><th>Point on type scale</th><th>Used by</th><th>Font size</th><th>Line height</th></tr>';
+  const html = '<p>The scale for large screens is used when the screen is wider than the tablet breakpoint (640px).</p>'
+    + '<table><caption>Large screens</caption>' + header
+    + '<tr><td>24</td><td><code>govuk-heading-m</code>, <code>govuk-body-l</code></td><td>24px</td><td>30px</td></tr></table>'
+    + '<table><caption>Small screens</caption>' + header
+    + '<tr><td>24</td><td><code>govuk-body-l</code></td><td>21px</td><td>25px</td></tr></table>';
+  const rules = extractRules(htmlText(html), 'type');
+  assert.deepEqual(rules.map(rule => [rule.name, rule.size, rule.aboveWidth, rule.maxWidth]), [
+    ['.govuk-heading-m', '24px', 640, undefined],
+    ['.govuk-body-l', '24px', 640, undefined],
+    ['.govuk-body-l', '21px', undefined, 640],
+  ]);
+  assert.ok(rules.every(rule => rule.conditionEvidence?.includes('640px')));
+});
+
 test('source readers preserve provenance and treat unknown files honestly', async () => {
   const a = sourceFromText('A', 'Heading 32px #333'); const b = sourceFromText('B', 'Heading 32px #333'); assert.equal(a.sha256, b.sha256); assert.notEqual(a.id, b.id);
   const file = await readAsset('test.css', Buffer.from('h1 { font-size:20px; color:#111; }'), 'text/css'); assert.equal(file.rules.length, 1);
@@ -84,7 +100,7 @@ test('local intake saves reviewed versions, rejects conflicts and preserves uplo
   } finally { await new Promise<void>(resolve => server.close(() => resolve())); await rm(root, { recursive: true, force: true }); }
 });
 
-test('intake browser replaces the active design system and preserves it after a failed import', { timeout: 60000 }, async () => {
+test('intake browser combines references in one design system and keeps them after a failed import', { timeout: 60000 }, async () => {
   const configuredFigma = process.env.FIGMA_ACCESS_TOKEN; delete process.env.FIGMA_ACCESS_TOKEN;
   const root = await mkdtemp(join(tmpdir(), 'auditor-intake-ui-')); const server = intakeServer(root); await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
   const browser = await chromium.launch({ headless: true, executablePath: process.env.CHROMIUM ?? chromium.executablePath() });
@@ -96,18 +112,18 @@ test('intake browser replaces the active design system and preserves it after a 
     await page.getByRole('button', { name: 'Load design system', exact: true }).click();
     await page.waitForFunction(() => document.querySelectorAll('.rule').length === 1);
     await page.locator('#files').setInputFiles({ name: 'styles.css', mimeType: 'text/css', buffer: Buffer.from('.body {font-size:16px;color:#444}') });
-    await page.getByText('styles.css', { exact: true }).waitFor();
-    assert.equal(await page.locator('.rule').count(), 1);
+    await page.locator('#sources').getByText('styles.css', { exact: true }).waitFor();
+    assert.equal(await page.locator('.rule').count(), 2);
     await page.getByLabel('Design system link').fill('https://www.figma.com/design/abcde/Example');
-    await page.getByRole('button', { name: 'Replace design system', exact: true }).click();
+    await page.getByRole('button', { name: 'Add another link', exact: true }).click();
     await page.getByText('This Figma link needs a connection. Upload a Figma JSON export to continue.').waitFor();
-    assert.equal(await page.locator('.source').count(), 1);
+    assert.equal(await page.locator('.source').count(), 2);
     await page.getByRole('button', { name: 'Confirm and continue', exact: true }).click();
     await page.locator('#target-panel').waitFor({ state: 'visible' });
     const savedPath = await page.locator('#saved code').innerText();
     const persisted = JSON.parse(await readFile(join(root, savedPath), 'utf8'));
-    assert.equal(persisted.sources.length, 1);
-    assert.equal(persisted.sources[0].name, 'styles.css');
+    assert.equal(persisted.sources.length, 2);
+    assert.equal(persisted.sources[1].name, 'styles.css');
     assert.deepEqual(errors, []);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
   } finally { if (configuredFigma !== undefined) process.env.FIGMA_ACCESS_TOKEN = configuredFigma; await browser.close(); await new Promise<void>(resolve => server.close(() => resolve())); await rm(root, { recursive: true, force: true }); }

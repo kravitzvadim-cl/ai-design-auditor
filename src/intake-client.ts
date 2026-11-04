@@ -13,10 +13,10 @@ function updateSave() { get<HTMLButtonElement>('save').disabled = busy || !rules
 function renderSources() {
   const list = get('sources'); list.replaceChildren();
   get('rule-panel').hidden = sourceList.length === 0 && rules.length === 0;
-  get('add-source').textContent = sourceList.length ? 'Replace design system' : 'Load design system';
+  get('add-source').textContent = sourceList.length ? 'Add another link' : 'Load design system';
   for (const source of sourceList) {
     const card = element('div', '', 'source'); const head = element('div', '', 'source-head'); const name = element('div', source.name, 'source-name');
-    const remove = element('button', 'Remove'); remove.type = 'button'; remove.setAttribute('aria-label', `Remove source ${source.name}`);
+    const remove = element('button', 'Remove'); remove.type = 'button'; remove.setAttribute('aria-label', `Remove reference ${source.name}`);
     remove.onclick = () => { sourceList.splice(sourceList.indexOf(source), 1); rules = rules.filter(r => r.sourceId !== source.id); renderSources(); renderRules(); changed(); };
     const interpret = element('button', 'Interpret with AI'); interpret.type='button';interpret.disabled=!aiAvailable||busy||!source.text.trim();interpret.setAttribute('aria-label',`Interpret ${source.name} with AI`);
     interpret.onclick=()=>void importing(async()=>{
@@ -52,7 +52,11 @@ function renderRules() {
     const swatch = element('span', '', 'swatch'); swatch.setAttribute('aria-hidden', 'true'); if (CSS.supports('color', rule.color)) swatch.style.backgroundColor = rule.color; const colorInput = color.querySelector('input')!; colorInput.placeholder = '#183b36'; const pair = element('div', '', 'color-field'); pair.append(swatch, colorInput); color.append(pair);
     const mode = element('div'); const label = element('label', 'Applies to'); label.htmlFor = `mode-${rule.id}`; const select = element('select'); select.id = label.htmlFor;
     for (const [value, text] of [['all', 'Both themes'], ['light', 'Light'], ['dark', 'Dark']]) { const option = element('option', text); option.value = value!; select.append(option); } select.value = rule.theme; select.onchange = () => { rule.theme = select.value as IntakeRule['theme']; changed(); }; mode.append(label, select);
-    fields.append(size, color, mode); const provenance = element('details', '', 'provenance'); provenance.append(element('summary', rule.sourceId === 'manual' ? 'Source and width conditions' : 'Rule source and width conditions'), element('p', rule.evidence),element('p',rule.conditionEvidence??''));
+    const reference = sourceList.find(source => source.id === rule.sourceId);
+    const widthNote = rule.aboveWidth !== undefined ? `Above ${rule.aboveWidth}px`
+      : rule.maxWidth !== undefined ? `Up to ${rule.maxWidth}px` : '';
+    if (widthNote) row.append(element('p', widthNote, 'hint'));
+    fields.append(size, color, mode); const provenance = element('details', '', 'provenance'); provenance.append(element('summary', rule.sourceId === 'manual' ? 'Source and width conditions' : 'Rule source and width conditions'), element('p', reference?.name ?? 'Manually entered'), element('p', rule.evidence),element('p',rule.conditionEvidence??''));
     const conditions=element('div','','rule-fields');for(const [key,label] of [['aboveWidth','Above width (px)'],['maxWidth','Up to width (px)']] as const){const condition=field(label,rule[key]===undefined?'':String(rule[key]),value=>{if(value.trim()==='')delete rule[key];else rule[key]=Number(value);},`${key}-${rule.id}`);const input=condition.querySelector('input')!;input.type='number';input.min='0';input.max='10000';conditions.append(condition);}provenance.append(conditions);
     row.append(head, fields, provenance); list.append(row);
   }
@@ -63,17 +67,25 @@ async function add(data: unknown) {
   if (result.state === 'connection-required') {
     throw new Error('This Figma link needs a connection. Upload a Figma JSON export to continue.');
   }
-  sourceList.splice(0, sourceList.length, result);
-  rules = [...result.rules];
-  get<HTMLInputElement>('system-name').value = result.name.length <= 120 ? result.name : 'My design system'; renderSources(); renderRules(); changed();
+  if (sourceList.some(source => source.name === result.name && source.sha256 === result.sha256)) {
+    throw new Error('This reference is already in your design system.');
+  }
+  if (!sourceList.length && !rules.length) {
+    get<HTMLInputElement>('system-name').value = result.name.length <= 120 ? result.name : 'My design system';
+  }
+  sourceList.push(result);
+  rules.push(...result.rules);
+  renderSources(); renderRules(); changed();
   return result;
 }
 async function importing(action: () => Promise<void>) {
   if (busy) return; busy = true; get<HTMLButtonElement>('add-source').disabled = true; get<HTMLButtonElement>('choose-files').disabled = true; updateSave(); status('import-status', 'Reading your design system…');
-  try { await action(); status('import-status', 'Check the text styles below, then select Confirm and continue.'); } catch (error) { status('import-status', error instanceof Error ? error.message : 'Design system could not be read.', true); }
+  try { await action(); status('import-status', 'Reference added. Add another link or file, or confirm the text styles to continue.'); } catch (error) { status('import-status', error instanceof Error ? error.message : 'Design system could not be read.', true); }
   finally { busy = false; get<HTMLButtonElement>('add-source').disabled = false; get<HTMLButtonElement>('choose-files').disabled = false; renderSources(); updateSave(); }
 }
-get<HTMLFormElement>('import-form').onsubmit = event => { event.preventDefault(); const value = get<HTMLTextAreaElement>('source-input').value.trim(); if (!value) return; void importing(async () => { await add({ type: /^https?:\/\/\S+$/i.test(value) ? 'link' : 'text', value }); get<HTMLTextAreaElement>('source-input').value = ''; }); };
+get<HTMLFormElement>('import-form').onsubmit = event => { event.preventDefault(); const value = get<HTMLTextAreaElement>('source-input').value.trim(); if (!value) return; void importing(async () => { const isLink = /^https?:\/\/\S+$/i.test(value);
+  if (isLink && sourceList.some(source => source.kind === 'Website' && source.name === new URL(value).href)) throw new Error('This link is already in your design system.');
+  await add({ type: isLink ? 'link' : 'text', value }); get<HTMLTextAreaElement>('source-input').value = ''; }); };
 async function files(list: FileList | File[]) {
   await importing(async () => {
     if (list.length !== 1) throw new Error('Choose one design system file.');

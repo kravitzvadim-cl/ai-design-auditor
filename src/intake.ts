@@ -49,6 +49,38 @@ export function extractRules(text: string, sourceId: string): IntakeRule[] {
     };
     walk(JSON.parse(text), '');
   } catch { /* Not JSON; use explicit text/CSS readers. */ }
+  // GOV.UK-style responsive tables name CSS classes and separate font size from line height.
+  const lines = text.split('\n').map(line => line.trim()).filter(Boolean);
+  const breakpoint = lines.find(line => /large screens.*wider than.*breakpoint \(\d{2,4}px\)/i.test(line));
+  const width = Number(breakpoint?.match(/breakpoint \((\d{2,4})px\)/i)?.[1]);
+  if (breakpoint && width > 0) {
+    for (let i = 0; i < lines.length - 1; i++) {
+      const caption = lines[i]!.toLowerCase();
+      if (!['large screens', 'small screens'].includes(caption) ||
+          !/^point on type scale\s*\|\s*used by\s*\|\s*font size\s*\|\s*line height$/i.test(lines[i + 1]!)) continue;
+      for (let j = i + 2; j < lines.length; j++) {
+        const row = lines[j]!;
+        const [point, usedBy, size] = row.split('|').map(cell => cell.trim());
+        if (!/^\d+$/.test(point ?? '') || !size || !validSize(size)) break;
+        for (const name of (usedBy ?? '').split(',').map(name => name.trim())) {
+          if (!/^govuk-(?:heading|body)(?:-[a-z]+)?$/.test(name)) continue;
+          const opposite = result.find(rule => rule.name === '.' + name && rule.size === size && !rule.color &&
+            (caption === 'large screens' ? rule.maxWidth === width : rule.aboveWidth === width));
+          if (opposite) {
+            delete opposite.aboveWidth;
+            delete opposite.maxWidth;
+            opposite.evidence += ' / ' + caption + ' | ' + row;
+            opposite.conditionEvidence = 'The documented value is the same in both tables.';
+            continue;
+          }
+          result.push({ id: randomUUID(), name: '.' + name, size, color: '', sourceId, theme: 'all',
+            evidence: caption + ' | ' + row,
+            ...(caption === 'large screens' ? { aboveWidth: width } : { maxWidth: width }),
+            conditionEvidence: breakpoint });
+        }
+      }
+    }
+  }
   // Labeled lines and table rows. No font size inferred from rendered pixels.
   for (const line of text.split(/\n/)) {
     if (line.length > 1000 || /[{}]/.test(line) || /clamp\(/i.test(line)) continue;
@@ -115,7 +147,7 @@ export function htmlText(html: string): string {
       return '\n' + cells.join(' | ') + '\n';
     })
     .replace(/<\/(?:td|th)>/gi, ' | ')
-    .replace(/<(?:br\s*\/?|\/(?:p|div|tr|li|h[1-6]|section))>/gi, '\n')
+    .replace(/<(?:br\s*\/?|\/(?:p|div|tr|li|h[1-6]|section|caption))>/gi, '\n')
     .replace(/<[^>]*>/g, ' ').replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&')
     .replace(/&lt;/gi, '<').replace(/&gt;/gi, '>').replace(/&quot;/gi, '"').replace(/[ \t]+/g, ' ');
 }
